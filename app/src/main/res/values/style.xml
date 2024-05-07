@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="customButtonCategory" parent="Widget.AppCompat.Button">
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:backgroundTint">@color/teal_200</item>
+        <item name="android:paddingHorizontal">18dp</item>
+        <item name="android:paddingVertical">12dp</item>
+        <item name="android:textAppearanceButton">@style/customTextButtonCategory</item>
+    </style>
+
+    <style name="customTextButtonCategory" parent="">
+        <item name="android:textColor">@color/purple_500</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>
