@@ -22,7 +22,7 @@ public class GalleryFragment extends Fragment {
         GalleryViewModel galleryViewModel =
                 new ViewModelProvider(this).get(GalleryViewModel.class);
 
-        ((MainActivity) requireActivity()).showToolbar(false);
+/*        ((MainActivity) requireActivity()).showToolbar(false);*/
 
         binding = FragmentGalleryBinding.inflate(inflater, container, false);
         View root = binding.getRoot();

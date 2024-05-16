@@ -22,7 +22,7 @@ public class SlideshowFragment extends Fragment {
         SlideshowViewModel slideshowViewModel =
                 new ViewModelProvider(this).get(SlideshowViewModel.class);
 
-        ((MainActivity) requireActivity()).showToolbar(false);
+        /*((MainActivity) requireActivity()).showToolbar(false);*/
 
         binding = FragmentSlideshowBinding.inflate(inflater, container, false);
         View root = binding.getRoot();

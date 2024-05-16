@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_homes">
+    app:startDestination="@+id/tasks">
 
     <fragment
-        android:id="@+id/nav_homes"
-        android:name="com.example.planner.ui.home.HomeFragment"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/tasks"
+        android:name="com.example.planner.ui.tasks.TasksFragment"
+        tools:layout="@layout/fragment_tasks" />
 
     <fragment
         android:id="@+id/nav_gallery"

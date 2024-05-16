@@ -4,12 +4,14 @@ import static java.security.AccessController.getContext;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
+import android.media.AudioTrack;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -19,10 +21,13 @@ import android.view.View;
 import android.view.Menu;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -51,49 +56,18 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Button> categoriesBtn;
 
+    private Dialog men;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-
-        View customToolbar = inflater.inflate(R.layout.custom_toolbar_layout, null);
-
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(false);
-            actionBar.setTitle("");
-        }
-
-        toolbar.addView(customToolbar);
-
-        categoriesBtn = new ArrayList<>();
-        categoriesBtn.add(createNavBtn("Все", customToolbar));
-        categoriesBtn.add(createNavBtn("Личное", customToolbar));
-        categoriesBtn.add(createNavBtn("Учёба", customToolbar));
-        categoriesBtn.add(createNavBtn("Работа", customToolbar));
-        categoriesBtn.add(createNavBtn("Желания", customToolbar));
-        activeCategory = categoriesBtn.get(0);
-        ViewCompat.setBackgroundTintList(activeCategory,
-                ContextCompat.getColorStateList(customToolbar.getContext(), R.color.teal_700));
-
-
-        Drawable drawable = toolbar.getOverflowIcon();
-        if (drawable != null) {
-            drawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_ATOP);
-        }
-
         BottomNavigationView navigation = binding.appBarMain.bottomNavigation;
-
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupWithNavController(navigation, navController);
+
     }
 
     @Override
@@ -118,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    public void showToolbar(boolean show) {
+    /*public void showToolbar(boolean show) {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             if (show) {
@@ -160,10 +134,12 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout layout = (LinearLayout) findViewById(R.id.toolbarBtns);
         layout.addView(button);
         return button;
-    }
+    }*/
 
     public void openDrawer(MenuItem item) {
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.openDrawer(GravityCompat.START);
     }
+
+
 }
