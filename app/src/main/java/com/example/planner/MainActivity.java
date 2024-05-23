@@ -52,12 +52,6 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
 
-    private Button activeCategory;
-
-    private ArrayList<Button> categoriesBtn;
-
-    private Dialog men;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = binding.appBarMain.bottomNavigation;
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupWithNavController(navigation, navController);
-
     }
 
     @Override
@@ -92,54 +85,9 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    /*public void showToolbar(boolean show) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            if (show) {
-                actionBar.show();
-            } else {
-                actionBar.hide();
-            }
-        }
-    }
-
-    public Button createNavBtn(String text, View v) {
-
-        ContextThemeWrapper newContext = new ContextThemeWrapper(v.getContext(), R.style.customButtonCategory);
-        Button button = new Button(newContext);
-        button.setText(text);
-        button.setId(View.generateViewId());
-
-        int margin = getResources().getDimensionPixelSize(R.dimen.button_margin);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        layoutParams.setMargins(0, 0, margin, 0);
-        button.setLayoutParams(layoutParams);
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (activeCategory != null) {
-                    ViewCompat.setBackgroundTintList(activeCategory,
-                            ContextCompat.getColorStateList(v.getContext(), R.color.teal_200));
-                }
-                activeCategory = button;
-                ViewCompat.setBackgroundTintList(activeCategory,
-                        ContextCompat.getColorStateList(v.getContext(), R.color.teal_700));
-            }
-        });
-
-        LinearLayout layout = (LinearLayout) findViewById(R.id.toolbarBtns);
-        layout.addView(button);
-        return button;
-    }*/
-
     public void openDrawer(MenuItem item) {
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.openDrawer(GravityCompat.START);
     }
-
 
 }

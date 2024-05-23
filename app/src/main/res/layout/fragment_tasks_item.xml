@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:paddingVertical="5dp"
+    android:background="#E2FCFF"
     android:orientation="horizontal">
 
     <CheckBox
@@ -10,24 +14,27 @@
         android:layout_height="wrap_content" />
 
     <LinearLayout
+        android:id="@+id/contentPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:clickable="true"
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/titleTaskItem"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="TextView"
             android:textColor="@color/black"
-            android:textSize="28sp"/>
+            android:textSize="28sp" />
+
         <TextView
             android:id="@+id/priorityTaskItem"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="TextView" />
-
 
     </LinearLayout>
 </LinearLayout>

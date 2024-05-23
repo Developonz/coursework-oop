@@ -5,6 +5,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.planner.databinding.FragmentTasksItemBinding;
@@ -22,14 +24,17 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_TASK = 1;
 
-    public TasksRecyclerViewAdapter(List<Task> tasks, String category) {
+    private OnItemRecyclerClickListener listener;
+
+    public TasksRecyclerViewAdapter(List<Task> tasks, String category, OnItemRecyclerClickListener listener) {
         allTasks = tasks;
         items = new ArrayList<>();
         this.category = category;
+        this.listener = listener;
         generateItems();
     }
 
-    private void generateItems() {
+    public void generateItems() {
         items.clear();
         if (allTasks.isEmpty()) return;
 
@@ -62,7 +67,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         if (viewType == VIEW_TYPE_HEADER) {
             return new HeaderHolder(HeaderTasksListBinding.inflate(inflater, parent, false));
         } else {
-            return new TaskHolder(FragmentTasksItemBinding.inflate(inflater, parent, false));
+            return new TaskHolder(FragmentTasksItemBinding.inflate(inflater, parent, false), listener);
         }
     }
 
@@ -72,6 +77,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
             ((HeaderHolder) holder).header.setText(((Task)items.get(position + 1)).getStringDate());
         } else {
             Task task = (Task) items.get(position);
+            ((TaskHolder) holder).mCheck.setChecked(false);
             ((TaskHolder) holder).mContentView.setText(task.getTitle());
             ((TaskHolder) holder).mPriorityView.setText(task.getPriority());
         }
@@ -95,6 +101,10 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         notifyDataSetChanged();
     }
 
+    public int getTask(int position) {
+        return allTasks.indexOf(items.get(position));
+    }
+
     public static class HeaderHolder extends RecyclerView.ViewHolder {
         public final TextView header;
 
@@ -105,13 +115,33 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     public static class TaskHolder extends RecyclerView.ViewHolder {
+        public final CheckBox mCheck;
         public final TextView mContentView;
         public final TextView mPriorityView;
 
-        public TaskHolder(FragmentTasksItemBinding binding) {
+        public TaskHolder(FragmentTasksItemBinding binding, OnItemRecyclerClickListener listener) {
             super(binding.getRoot());
+            mCheck = binding.checkBoxItem;
             mContentView = binding.titleTaskItem;
             mPriorityView = binding.priorityTaskItem;
+
+            mCheck.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        mCheck.postDelayed(() -> listener.onItemCheckBoxClick(position), 750);
+                    }
+                }
+            });
+
+            binding.contentPanel.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemViewClick(position);
+                    }
+                }
+            });
         }
     }
 }
