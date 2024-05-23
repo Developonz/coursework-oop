@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="categories" >
+        <item >Без категории</item>
+        <item>Личное</item>
+        <item>Учёба</item>
+        <item>Работа</item>
+        <item>Желания</item>
+    </string-array>
+
+    <string-array name="priorities" >
+        <item >Важно - срочно</item>
+        <item>Важно - не срочно</item>
+        <item>Не важно - срочно</item>
+        <item>Не важно - не срочно</item>
+    </string-array>
+</resources>

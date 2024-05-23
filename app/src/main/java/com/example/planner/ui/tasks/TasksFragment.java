@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
@@ -38,7 +39,10 @@ import android.widget.Toast;
 import com.example.planner.MainActivity;
 import com.example.planner.R;
 import com.example.planner.databinding.FragmentTasksBinding;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -52,7 +56,7 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
     private Button activeCategory;
     private final String[] categoriesTitle = {"Все", "Личное", "Учёба", "Работа", "Желания"};
     private final String[] priorities = {"Важно - срочно", "Важно - не срочно", "Не важно - срочно", "Не важно - не срочно"};
-    private final String[] category = {"Без", "Личное", "Учёба", "Работа", "Желания"};
+    private final String[] category = {"Без категории", "Личное", "Учёба", "Работа", "Желания"};
     private ArrayList<Task> taskList = new ArrayList<>();
     private LocalDate selectedDate = LocalDate.now();
     private LocalDate chosedDate = LocalDate.now();
@@ -60,7 +64,7 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
     private FragmentTasksBinding binding;
     private RecyclerView recyclerView;
     private Toolbar toolbar;
-    private Dialog taskDialog;
+    private BottomSheetDialog taskDialog;
 
     private ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
         @Override
@@ -120,8 +124,11 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         taskDialog = createTaskDialog();
 
         binding.addTaskBtn.setOnClickListener(v -> {
-            ((Spinner) taskDialog.findViewById(R.id.categoryNewTask)).setSelection(categoriesBtn.indexOf(activeCategory));
-            ((EditText) taskDialog.findViewById(R.id.titleNewTask)).setText("");
+            ((AutoCompleteTextView) taskDialog.findViewById(R.id.categoryNewTask)).setSelection(categoriesBtn.indexOf(activeCategory));
+
+
+            ((TextInputEditText) taskDialog.findViewById(R.id.titleNewTask)).setText("");
+
             taskDialog.show();
         });
     }
@@ -224,13 +231,14 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         return button;
     }
 
-    private void setupSpinner(Spinner spinner, String[] set) {
+    private void setupSpinner(AutoCompleteTextView spinner, String[] set) {
+        String[] items = getResources().getStringArray(R.array.categories);
         ArrayAdapter<String> SpinAdapter = new ArrayAdapter<>(((MainActivity) requireActivity()), android.R.layout.simple_spinner_item, set);
         SpinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(SpinAdapter);
     }
 
-    private void setSpinnerSelection(Spinner spinner, String value, String[] set) {
+    private void setSpinnerSelection(AutoCompleteTextView spinner, String value, String[] set) {
         setupSpinner(spinner, set);
         for (int i = 0; i < spinner.getAdapter().getCount(); ++i) {
             if (spinner.getAdapter().getItem(i).toString().equals(value)) {
@@ -240,24 +248,31 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         }
     }
 
-    private Dialog createTaskDialog() {
-        Dialog dialog = new Dialog(((MainActivity) requireActivity()));
+    private BottomSheetDialog createTaskDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(((MainActivity) requireActivity()));
         dialog.setContentView(R.layout.create_task_menu);
-
-        Spinner categorySpin = (Spinner) dialog.findViewById(R.id.categoryNewTask);
-        setupSpinner(categorySpin, category);
-        Spinner prioritySpin = (Spinner) (dialog.findViewById(R.id.priorityNewTask));
-        setupSpinner(prioritySpin, priorities);
 
         ((CalendarView) dialog.findViewById(R.id.calendarViewNewTask)).setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             selectedDate = LocalDate.of(year, month + 1, dayOfMonth);
         });
 
+        AutoCompleteTextView categoryATV = dialog.findViewById(R.id.categoryNewTask);
+        String[] items = getResources().getStringArray(R.array.categories);
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(((MainActivity) requireActivity()), android.R.layout.simple_dropdown_item_1line, items);
+        categoryATV.setAdapter(categoryAdapter);
+        categoryATV.setText(items[0], false);
+
+        AutoCompleteTextView priorityATV = dialog.findViewById(R.id.priorityNewTask);
+        items = getResources().getStringArray(R.array.priorities);
+        ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(((MainActivity) requireActivity()), android.R.layout.simple_dropdown_item_1line, items);
+        priorityATV.setAdapter(priorityAdapter);
+        priorityATV.setText(items[0], false);
+
         dialog.findViewById(R.id.createTaskBtn).setOnClickListener(v -> {
             String title = ((EditText) dialog.findViewById(R.id.titleNewTask)).getText().toString();
             if (!(title.isEmpty())) {
-                String category = (String) categorySpin.getSelectedItem();
-                String priority = (String) prioritySpin.getSelectedItem();
+                String category =  categoryATV.getText().toString();
+                String priority =  priorityATV.getText().toString();
                 Task task = new Task(title, selectedDate, priority, category);
                 ((EditText) dialog.findViewById(R.id.titleNewTask)).setText("");
                 adapter.addItem(task);
@@ -289,10 +304,10 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         });
         calendarView.setDate(task.getTaskDate().toEpochDay() * 24 * 60 * 60 * 1000);
 
-        Spinner categorySpin = (Spinner) (dialog.findViewById(R.id.categoryNewTask));
+        AutoCompleteTextView categorySpin = (AutoCompleteTextView) (dialog.findViewById(R.id.categoryNewTask));
         setSpinnerSelection(categorySpin, task.getCategory(), category);
 
-        Spinner prioritySpin = (Spinner) (dialog.findViewById(R.id.priorityNewTask));
+        AutoCompleteTextView prioritySpin = (AutoCompleteTextView) (dialog.findViewById(R.id.priorityNewTask));
         setSpinnerSelection(prioritySpin, task.getPriority(), priorities);
 
         ((EditText) dialog.findViewById(R.id.titleNewTask)).setText(task.getTitle());
@@ -301,8 +316,8 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         dialog.findViewById(R.id.createTaskBtn).setOnClickListener(v -> {
             String title = ((EditText) dialog.findViewById(R.id.titleNewTask)).getText().toString();
             if (!title.isEmpty()) {
-                String category = (String) categorySpin.getSelectedItem();
-                String priority = (String) prioritySpin.getSelectedItem();
+                String category = categorySpin.getText().toString();
+                String priority = prioritySpin.getText().toString();
                 task.setTitle(title);
                 task.setCategory(category);
                 task.setPriority(priority);
