@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="5dp"
     android:paddingVertical="5dp"
+    android:paddingRight="10dp"
     android:background="#E2FCFF"
     android:orientation="horizontal">
 
@@ -24,16 +25,16 @@
             android:id="@+id/titleTaskItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="TextView"
             android:textColor="@color/black"
-            android:textSize="28sp" />
+            android:textSize="22sp"
+            android:ellipsize="end"
+            android:maxLines="1"/>
 
         <TextView
             android:id="@+id/priorityTaskItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="TextView" />
 
     </LinearLayout>
