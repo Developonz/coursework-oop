@@ -12,6 +12,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.OnLifecycleEvent;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,14 +26,17 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.example.planner.MainActivity;
 import com.example.planner.R;
 import com.example.planner.databinding.FragmentTasksBinding;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -126,17 +134,22 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         adapter = new TasksRecyclerViewAdapter(taskList, (String) activeCategory.getText(), this);
         recyclerView.setAdapter(adapter);
 
-        BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = new BottomSheetTaskMenuInfo(adapter);
-
         binding.addTaskBtn.setOnClickListener(v -> {
+            BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = new BottomSheetTaskMenuInfo(adapter);
             bottomSheetTaskMenuInfo.show(getParentFragmentManager(), bottomSheetTaskMenuInfo.getTag());
-            /*((AutoCompleteTextView) taskDialog.findViewById(R.id.categoryNewTask)).setSelection(categoriesBtn.indexOf(activeCategory));
 
-
-            ((TextInputEditText) taskDialog.findViewById(R.id.titleNewTask)).setText("");
-
-            taskDialog.show();*/
+            LifecycleEventObserver observer = new LifecycleEventObserver() {
+                @Override
+                public void onStateChanged(LifecycleOwner source, Lifecycle.Event event) {
+                    if (event == Lifecycle.Event.ON_RESUME) {
+                        bottomSheetTaskMenuInfo.setCategory(categoriesBtn.indexOf(activeCategory));
+                        bottomSheetTaskMenuInfo.getLifecycle().removeObserver(this);
+                    }
+                }
+            };
+            bottomSheetTaskMenuInfo.getLifecycle().addObserver(observer);
         });
+
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
@@ -165,8 +178,8 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         int pos = adapter.getTask(position);
         Task task = taskList.get(pos);
 
-        /*Dialog createTaskUpdateDialog = updateTaskDialog(task);*/
-        /*createTaskUpdateDialog.show();*/
+        BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = new BottomSheetTaskMenuInfo(adapter, task);
+        bottomSheetTaskMenuInfo.show(getParentFragmentManager(), bottomSheetTaskMenuInfo.getTag());
     }
 
     private void setupToolbar() {
@@ -226,123 +239,4 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         layout.addView(button);
         return button;
     }
-
-    /*private BottomSheetDialog createTaskDialog() {
-        BottomSheetDialog dialog = new BottomSheetDialog(((MainActivity) requireActivity()), R.style.AppBottomSheetDialogTheme);
-        dialog.setContentView(R.layout.task_menu);
-        *//*dialog.getBehavior().setDraggable(false);*//*
-
-        selectedDate = LocalDate.now();
-        CalendarView calendarView = initCalendar(dialog);
-
-        AutoCompleteTextView categoryATV = dialog.findViewById(R.id.categoryNewTask);
-        String[] items = getResources().getStringArray(R.array.categories);
-        setupDropDown(categoryATV, items, items[0]);
-
-        AutoCompleteTextView priorityATV = dialog.findViewById(R.id.priorityNewTask);
-        items = getResources().getStringArray(R.array.priorities);
-        setupDropDown(priorityATV, items, items[0]);
-
-        ((TextView) dialog.findViewById(R.id.dateTVBS)).setText(selectedDate.toString());
-
-        dialog.findViewById(R.id.createTaskBtn).setOnClickListener(v -> {
-            String title = ((EditText) dialog.findViewById(R.id.titleNewTask)).getText().toString();
-            if (!(title.isEmpty())) {
-                String category =  categoryATV.getText().toString();
-                String priority =  priorityATV.getText().toString();
-                Task task = new Task(title, selectedDate, priority, category);
-                ((EditText) dialog.findViewById(R.id.titleNewTask)).setText("");
-                adapter.addItem(task);
-            } else {
-                Toast toast = Toast.makeText(requireContext(), "Название не может быть пустым", Toast.LENGTH_LONG);
-                View view = toast.getView();
-                view.setBackgroundColor(Color.parseColor("#333333"));
-                TextView text = view.findViewById(android.R.id.message);
-                text.setTextColor(Color.WHITE);
-                text.setGravity(Gravity.CENTER);
-                toast.show();
-            }
-        });
-
-        dialog.setOnKeyListener((dialog1, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                if (dialog.findViewById(R.id.info_bottom_sheet).getVisibility() == View.GONE) {
-                    dialog.findViewById(R.id.info_bottom_sheet).setVisibility(View.VISIBLE);
-                    dialog.findViewById(R.id.deadline_bottom_sheet).setVisibility(View.GONE);
-                    ((TextView) dialog.findViewById(R.id.dateTVBS)).setText(selectedDate.toString());
-                } else {
-                    dialog.dismiss();
-                }
-                return true;
-            }
-            return false;
-        });
-
-        dialog.findViewById(R.id.dateLL).setOnClickListener(v -> {
-            dialog.findViewById(R.id.info_bottom_sheet).setVisibility(View.GONE);
-            dialog.findViewById(R.id.deadline_bottom_sheet).setVisibility(View.VISIBLE);
-        });
-
-        return dialog;
-    }
-
-    private Dialog updateTaskDialog(Task task) {
-        BottomSheetDialog dialog = new BottomSheetDialog(((MainActivity) requireActivity()), R.style.AppBottomSheetDialogTheme);
-        dialog.setContentView(R.layout.task_menu);
-        *//*dialog.getBehavior().setDraggable(false);*//*
-
-        selectedDate = task.getTaskDate();
-        CalendarView calendarView = initCalendar(dialog);
-        calendarView.setDate(task.getTaskDate().toEpochDay() * 24 * 60 * 60 * 1000);
-
-
-        AutoCompleteTextView categoryATV = dialog.findViewById(R.id.categoryNewTask);
-        String[] items = getResources().getStringArray(R.array.categories);
-        setupDropDown(categoryATV, items, task.getCategory());
-
-        AutoCompleteTextView priorityATV = dialog.findViewById(R.id.priorityNewTask);
-        items = getResources().getStringArray(R.array.priorities);
-        setupDropDown(priorityATV, items, task.getPriority());
-
-
-        ((EditText) dialog.findViewById(R.id.titleNewTask)).setText(task.getTitle());
-        ((Button) dialog.findViewById(R.id.createTaskBtn)).setText("Изменить");
-
-        dialog.findViewById(R.id.createTaskBtn).setOnClickListener(v -> {
-            String title = ((EditText) dialog.findViewById(R.id.titleNewTask)).getText().toString();
-            if (!title.isEmpty()) {
-                task.setTitle(title);
-                task.setCategory(categoryATV.getText().toString());
-                task.setPriority(priorityATV.getText().toString());
-                task.setTaskDate(selectedDate);
-                adapter.generateItems();
-                adapter.notifyDataSetChanged();
-                dialog.dismiss();
-            } else {
-                Toast toast = Toast.makeText(requireContext(), "Название не может быть пустым", Toast.LENGTH_LONG);
-                View view = toast.getView();
-                view.setBackgroundColor(Color.parseColor("#333333"));
-                TextView text = view.findViewById(android.R.id.message);
-                text.setTextColor(Color.WHITE);
-                text.setGravity(Gravity.CENTER);
-                toast.show();
-            }
-        });
-        return dialog;
-    }
-
-
-    private void setupDropDown(AutoCompleteTextView dropDown, String[] items, String elem) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(((MainActivity) requireActivity()), android.R.layout.simple_dropdown_item_1line, items);
-        dropDown.setAdapter(adapter);
-        dropDown.setText(elem, false);
-    }
-
-    private CalendarView initCalendar(BottomSheetDialog dialog) {
-        CalendarView calendar = (CalendarView) (dialog.findViewById(R.id.calendarViewNewTask));
-        calendar.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
-            selectedDate = LocalDate.of(year, month + 1, dayOfMonth);
-        });
-        return calendar;
-    }*/
 }
