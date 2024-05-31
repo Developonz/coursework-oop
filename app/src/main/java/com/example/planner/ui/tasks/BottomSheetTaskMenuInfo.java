@@ -19,13 +19,17 @@ import com.example.planner.R;
 import com.example.planner.databinding.TaskMenuInfoBinding;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
 
     private TaskMenuInfoBinding binding;
     private LocalDate selectedDate;
+    private LocalTime selectedTime;
     private TasksRecyclerViewAdapter adapter;
     private boolean isUpdateMode = false;
     private Task taskToUpdate;
@@ -123,6 +127,36 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
 
             dismiss();
         });
+
+        binding.removeTime.setOnClickListener(v -> {
+            if (selectedTime != null) {
+                selectedTime = null;
+                binding.timeTVBS.setText("Нет");
+                binding.removeTime.setVisibility(View.GONE);
+            }
+        });
+
+        binding.timeLL.setOnClickListener(v -> {
+            MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                    .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                    .setTimeFormat(TimeFormat.CLOCK_24H)
+                    .setHour(12)
+                    .setMinute(0)
+                    .setTitleText("Установить время")
+                    .build();
+
+            timePicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectedTime = LocalTime.of(timePicker.getHour(), timePicker.getMinute());
+                    binding.removeTime.setVisibility(View.VISIBLE);
+                    binding.timeTVBS.setText(selectedTime.toString());
+                    timePicker.dismiss();
+                }
+            });
+
+            timePicker.show(getParentFragmentManager(), getTag());
+        });
     }
 
     private void setupDropDown(AutoCompleteTextView autoCompleteTextView, int arrayResourceId, String selectedItem) {
@@ -154,7 +188,7 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
         String title = binding.titleNewTask.getText().toString();
         String category = binding.categoryNewTask.getText().toString();
         String priority = binding.priorityNewTask.getText().toString();
-        Task task = new Task(title, selectedDate, priority, category);
+        Task task = new Task(title, selectedDate, selectedTime, priority, category);
         binding.titleNewTask.setText("");
         adapter.addItem(task);
     }
@@ -164,6 +198,7 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
         taskToUpdate.setCategory(binding.categoryNewTask.getText().toString());
         taskToUpdate.setPriority(binding.priorityNewTask.getText().toString());
         taskToUpdate.setTaskDate(selectedDate);
+        taskToUpdate.setTaskTime(selectedTime);
         adapter.generateItems();
         adapter.notifyDataSetChanged();
         dismiss();

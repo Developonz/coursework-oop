@@ -11,7 +11,7 @@ public class Task {
     private String category;
     private String[] mounths = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
 
-    public Task(String title, LocalDate taskDate, String priority, String category) {
+    public Task(String title, LocalDate taskDate, LocalTime time, String priority, String category) {
         this.title = title;
         this.taskDate = taskDate;
         this.priority = priority;
