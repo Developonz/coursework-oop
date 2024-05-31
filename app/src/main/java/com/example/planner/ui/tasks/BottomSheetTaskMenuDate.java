@@ -11,8 +11,10 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.planner.R;
 import com.example.planner.databinding.TaskMenuDateBinding;
 import com.example.planner.databinding.TaskMenuInfoBinding;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -58,6 +60,18 @@ public class BottomSheetTaskMenuDate extends BottomSheetDialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setupCalendar();
         return binding.getRoot();
+    }
+
+    @Override
+    public int getTheme() {
+        return R.style.AppBottomSheetDialogTheme;
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        View bottomSheet = getDialog().findViewById(com.google.android.material.R.id.design_bottom_sheet);
+        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setDraggable(false);
     }
 
 
