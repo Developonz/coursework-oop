@@ -49,12 +49,10 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
     private Button activeCategory;
     private final String[] categoriesTitle = {"Все", "Личное", "Учёба", "Работа", "Желания"};
     private ArrayList<Task> taskList = new ArrayList<>();
-    private LocalDate selectedDate = LocalDate.now();
     private TasksRecyclerViewAdapter adapter;
     private FragmentTasksBinding binding;
     private RecyclerView recyclerView;
     private Toolbar toolbar;
-    private BottomSheetDialog taskDialog;
 
     private ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
         @Override
@@ -135,19 +133,8 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         recyclerView.setAdapter(adapter);
 
         binding.addTaskBtn.setOnClickListener(v -> {
-            BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = new BottomSheetTaskMenuInfo(adapter);
-            bottomSheetTaskMenuInfo.show(getParentFragmentManager(), bottomSheetTaskMenuInfo.getTag());
-
-            LifecycleEventObserver observer = new LifecycleEventObserver() {
-                @Override
-                public void onStateChanged(LifecycleOwner source, Lifecycle.Event event) {
-                    if (event == Lifecycle.Event.ON_RESUME) {
-                        bottomSheetTaskMenuInfo.setCategory(categoriesBtn.indexOf(activeCategory));
-                        bottomSheetTaskMenuInfo.getLifecycle().removeObserver(this);
-                    }
-                }
-            };
-            bottomSheetTaskMenuInfo.getLifecycle().addObserver(observer);
+            BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = new BottomSheetTaskMenuInfo(adapter, getCategory(categoriesBtn.indexOf(activeCategory)));
+            bottomSheetTaskMenuInfo.show(getParentFragmentManager(), "BottomSheetTaskMenu");
         });
 
 
@@ -238,5 +225,14 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         LinearLayout layout = (LinearLayout) v.findViewById(R.id.toolbarBtns);
         layout.addView(button);
         return button;
+    }
+
+    private String getCategory(int number) {
+        String[] categories = getResources().getStringArray(R.array.categories);
+        String category = null;
+        if (number >= 0 && number < categories.length) {
+            category = categories[number];
+        }
+        return category;
     }
 }
