@@ -1,5 +1,6 @@
 package com.example.planner.ui.tasks;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,22 +34,26 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
+    private static boolean isOpenedThis = false;
     private TaskMenuInfoBinding binding;
     private LocalDate selectedDate;
     private LocalTime selectedTime;
     private TasksRecyclerViewAdapter adapter;
     private boolean isUpdateMode = false;
+    private boolean isOpenDate = false;
+    private boolean isOpenTime = false;
     private Task taskToUpdate;
     private String selectedCategory;
     private String selectedPriority;
 
-    public BottomSheetTaskMenuInfo(TasksRecyclerViewAdapter adapter, String category) {
+
+    private BottomSheetTaskMenuInfo(TasksRecyclerViewAdapter adapter, String category) {
         this.adapter = adapter;
         selectedDate = LocalDate.now();
         selectedCategory = category;
     }
 
-    public BottomSheetTaskMenuInfo(TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
+    private BottomSheetTaskMenuInfo(TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
         this.adapter = adapter;
         this.taskToUpdate = taskToUpdate;
         this.isUpdateMode = true;
@@ -82,6 +87,30 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
     @Override
     public int getTheme() {
         return R.style.AppBottomSheetDialogTheme;
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        isOpenedThis = false;
+    }
+
+    public static BottomSheetTaskMenuInfo getInstance(TasksRecyclerViewAdapter adapter, String category) {
+        if (!isOpenedThis) {
+            isOpenedThis = true;
+            return new BottomSheetTaskMenuInfo(adapter, category);
+        } else {
+            return null;
+        }
+    }
+
+    public static BottomSheetTaskMenuInfo getInstance(TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
+        if (!isOpenedThis) {
+            isOpenedThis = true;
+            return new BottomSheetTaskMenuInfo(adapter, taskToUpdate);
+        } else {
+            return null;
+        }
     }
 
     private void changeModeKeyBoarding() {
@@ -199,50 +228,67 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
     }
 
     private void openTimePicker() {
+        if (!isOpenTime) {
+            MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                    .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                    .setTimeFormat(TimeFormat.CLOCK_24H)
+                    .setHour((selectedTime != null) ? selectedTime.getHour() : 12)
+                    .setMinute((selectedTime != null) ? selectedTime.getMinute() : 0)
+                    .setTitleText("Установить время")
+                    .setTheme(R.style.TimePicker)
+                    .build();
 
-        MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
-                .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-                .setTimeFormat(TimeFormat.CLOCK_24H)
-                .setHour((selectedTime != null) ? selectedTime.getHour() : 12)
-                .setMinute((selectedTime != null) ? selectedTime.getMinute() : 0)
-                .setTitleText("Установить время")
-                .setTheme(R.style.TimePicker)
-                .build();
-
-        timePicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedTime = LocalTime.of(timePicker.getHour(), timePicker.getMinute());
-                binding.removeTime.setVisibility(View.VISIBLE);
-                binding.timeTVBS.setText(selectedTime.toString());
-            }
-        });
-        timePicker.show(getParentFragmentManager(), getTag());
+            timePicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectedTime = LocalTime.of(timePicker.getHour(), timePicker.getMinute());
+                    binding.removeTime.setVisibility(View.VISIBLE);
+                    binding.timeTVBS.setText(selectedTime.toString());
+                }
+            });
+            timePicker.addOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    isOpenTime = false;
+                }
+            });
+            isOpenTime = true;
+            timePicker.show(getParentFragmentManager(), getTag());
+        }
     }
 
     private void openDatePicker() {
-        ZonedDateTime zonedDateTime = selectedDate.atStartOfDay(ZoneOffset.UTC);
-        long milliseconds = zonedDateTime.toInstant().toEpochMilli();
+        if (!isOpenDate) {
+            ZonedDateTime zonedDateTime = selectedDate.atStartOfDay(ZoneOffset.UTC);
+            long milliseconds = zonedDateTime.toInstant().toEpochMilli();
 
-        MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
-        builder.setTitleText("Установить дату");
-        builder.setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR);
-        builder.setSelection(milliseconds);
-        builder.setTheme(R.style.DatePicker);
-        MaterialDatePicker<Long> datePicker = builder.build();
-        datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
-            @Override
-            public void onPositiveButtonClick(Long selection) {
-                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                calendar.setTimeInMillis(selection);
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH);
-                int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-                selectedDate = LocalDate.of(year, month + 1, dayOfMonth);
-                binding.dateTVBS.setText(selectedDate.toString());
-            }
-        });
-        datePicker.show(getParentFragmentManager(), getTag());
+            MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
+            builder.setTitleText("Установить дату");
+            builder.setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR);
+            builder.setSelection(milliseconds);
+            builder.setTheme(R.style.DatePicker);
+            MaterialDatePicker<Long> datePicker = builder.build();
+            datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
+                @Override
+                public void onPositiveButtonClick(Long selection) {
+                    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                    calendar.setTimeInMillis(selection);
+                    int year = calendar.get(Calendar.YEAR);
+                    int month = calendar.get(Calendar.MONTH);
+                    int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+                    selectedDate = LocalDate.of(year, month + 1, dayOfMonth);
+                    binding.dateTVBS.setText(selectedDate.toString());
+                }
+            });
+            datePicker.addOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    isOpenDate = false;
+                }
+            });
+            isOpenDate = true;
+            datePicker.show(getParentFragmentManager(), getTag());
+        }
     }
 
     private void showToast(String message) {

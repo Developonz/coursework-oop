@@ -1,5 +1,6 @@
 package com.example.planner.ui.tasks;
 
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -133,8 +134,9 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
         recyclerView.setAdapter(adapter);
 
         binding.addTaskBtn.setOnClickListener(v -> {
-            BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = new BottomSheetTaskMenuInfo(adapter, getCategory(categoriesBtn.indexOf(activeCategory)));
-            bottomSheetTaskMenuInfo.show(getParentFragmentManager(), "BottomSheetTaskMenu");
+                BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = BottomSheetTaskMenuInfo.getInstance(adapter, getCategory(categoriesBtn.indexOf(activeCategory)));
+                if (bottomSheetTaskMenuInfo != null)
+                    bottomSheetTaskMenuInfo.show(getParentFragmentManager(), "BottomSheetTaskMenu");
         });
 
 
@@ -164,9 +166,9 @@ public class TasksFragment extends Fragment implements OnItemRecyclerClickListen
     public void onItemViewClick(int position) {
         int pos = adapter.getTask(position);
         Task task = taskList.get(pos);
-
-        BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = new BottomSheetTaskMenuInfo(adapter, task);
-        bottomSheetTaskMenuInfo.show(getParentFragmentManager(), bottomSheetTaskMenuInfo.getTag());
+        BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = BottomSheetTaskMenuInfo.getInstance(adapter, task);
+        if (bottomSheetTaskMenuInfo != null)
+            bottomSheetTaskMenuInfo.show(getParentFragmentManager(), bottomSheetTaskMenuInfo.getTag());
     }
 
     private void setupToolbar() {
