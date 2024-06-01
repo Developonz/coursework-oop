@@ -206,6 +206,7 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
                 .setHour((selectedTime != null) ? selectedTime.getHour() : 12)
                 .setMinute((selectedTime != null) ? selectedTime.getMinute() : 0)
                 .setTitleText("Установить время")
+                .setTheme(R.style.TimePicker)
                 .build();
 
         timePicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
@@ -227,6 +228,7 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
         builder.setTitleText("Установить дату");
         builder.setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR);
         builder.setSelection(milliseconds);
+        builder.setTheme(R.style.DatePicker);
         MaterialDatePicker<Long> datePicker = builder.build();
         datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
             @Override

@@ -65,8 +65,8 @@
         android:gravity="center_vertical">
 
         <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginRight="5dp"
             android:src="@drawable/calendar"
             app:tint="#4C4C4C"/>
@@ -74,7 +74,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="22sp"
+            android:textSize="18sp"
             android:layout_weight="1"
             android:text="Срок по задаче" />
 
@@ -82,7 +82,7 @@
             android:id="@+id/dateTVBS"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:background="@drawable/background_task_menu_items"
             android:paddingVertical="5dp"
             android:paddingHorizontal="20dp"
@@ -100,8 +100,8 @@
         android:gravity="center_vertical">
 
         <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginRight="5dp"
             android:src="@drawable/alarm"
             app:tint="#4C4C4C"/>
@@ -109,7 +109,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="22sp"
+            android:textSize="18sp"
             android:layout_weight="1"
             android:text="Время задачи" />
 
@@ -117,7 +117,7 @@
             android:id="@+id/timeTVBS"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:background="@drawable/background_task_menu_items"
             android:paddingVertical="5dp"
             android:paddingHorizontal="20dp"
