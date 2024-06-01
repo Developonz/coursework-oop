@@ -46,5 +46,4 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation ("it.xabaras.android:recyclerview-swipedecorator:1.4")
-    implementation ("com.makeramen:roundedimageview:2.3.0")
 }

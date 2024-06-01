@@ -1,5 +1,6 @@
 package com.example.planner.ui.tasks;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -9,12 +10,19 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.planner.MainActivity;
+import com.example.planner.R;
 import com.example.planner.databinding.FragmentTasksItemBinding;
+import com.example.planner.databinding.HeaderOldTasksListBinding;
 import com.example.planner.databinding.HeaderTasksListBinding;
+import com.google.android.material.snackbar.Snackbar;
 
+import java.lang.ref.WeakReference;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -22,8 +30,9 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private final List<Object> items;
     private String category;
     private static final int VIEW_TYPE_HEADER = 0;
-    private static final int VIEW_TYPE_TASK = 1;
-
+    private static final int VIEW_TYPE_HEADER_OLD = 1;
+    private static final int VIEW_TYPE_TASK = 2;
+    private WeakReference<RecyclerView> recyclerViewRef;
     private OnItemRecyclerClickListener listener;
 
     public TasksRecyclerViewAdapter(List<Task> tasks, String category, OnItemRecyclerClickListener listener) {
@@ -34,40 +43,27 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         generateItems();
     }
 
-    public void generateItems() {
-        items.clear();
-        if (allTasks.isEmpty()) return;
-
-        allTasks.sort(Comparator.comparing(Task::getTaskDate));
-        String currentHeader = "";
-        for (Task task : allTasks) {
-            if (category.equals("Все") || task.getCategory().equals(category)) {
-                String taskDate = task.getStringDate();
-                if (!taskDate.equals(currentHeader)) {
-                    currentHeader = taskDate;
-                    items.add("");
-                }
-                items.add(task);
-            }
-        }
-    }
-
     @Override
     public int getItemViewType(int position) {
-        if (items.get(position) instanceof String) {
+        if (items.get(position) instanceof Task) {
+            return VIEW_TYPE_TASK;
+        } else if (items.get(position) == "") {
             return VIEW_TYPE_HEADER;
         } else {
-            return VIEW_TYPE_TASK;
+            return VIEW_TYPE_HEADER_OLD;
         }
     }
 
+    @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == VIEW_TYPE_HEADER) {
             return new HeaderHolder(HeaderTasksListBinding.inflate(inflater, parent, false));
-        } else {
+        } else if (viewType == VIEW_TYPE_TASK) {
             return new TaskHolder(FragmentTasksItemBinding.inflate(inflater, parent, false), listener);
+        } else {
+            return new HeaderOldHolder(HeaderOldTasksListBinding.inflate(inflater, parent, false));
         }
     }
 
@@ -75,7 +71,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderHolder) {
             ((HeaderHolder) holder).header.setText(((Task)items.get(position + 1)).getStringDate());
-        } else {
+        } else if (holder instanceof  TaskHolder) {
             Task task = (Task) items.get(position);
             ((TaskHolder) holder).mCheck.setChecked(false);
             ((TaskHolder) holder).mContentView.setText(task.getTitle());
@@ -86,6 +82,40 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    public void generateItems() {
+        items.clear();
+        if (allTasks.isEmpty()) return;
+
+        allTasks.sort(Comparator.comparing(Task::getTaskDate));
+
+
+        List<Task> oldTask = new ArrayList<>();
+
+        String currentHeader = "";
+        for (Task task : allTasks) {
+            if (!task.getTaskDate().isBefore(LocalDate.now())) {
+                if (category.equals("Все") || task.getCategory().equals(category)) {
+                    String taskDate = task.getStringDate();
+                    if (!taskDate.equals(currentHeader)) {
+                        currentHeader = taskDate;
+                        items.add("");
+                    }
+                    items.add(task);
+                }
+            } else {
+                oldTask.add(task);
+            }
+        }
+        if (!oldTask.isEmpty()) {
+            items.add("Old");
+            for (Task task : oldTask) {
+                if (category.equals("Все") || task.getCategory().equals(category)) {
+                    items.add(task);
+                }
+            }
+        }
     }
 
     public void addItem(Task task) {
@@ -109,6 +139,15 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         public final TextView header;
 
         public HeaderHolder(HeaderTasksListBinding binding) {
+            super(binding.getRoot());
+            header = binding.headerTasks;
+        }
+    }
+
+    public static class HeaderOldHolder extends RecyclerView.ViewHolder {
+        public final TextView header;
+
+        public HeaderOldHolder(HeaderOldTasksListBinding binding) {
             super(binding.getRoot());
             header = binding.headerTasks;
         }
