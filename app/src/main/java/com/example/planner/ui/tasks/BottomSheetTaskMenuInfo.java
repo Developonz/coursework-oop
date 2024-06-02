@@ -82,6 +82,7 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
         View bottomSheet = getDialog().findViewById(com.google.android.material.R.id.design_bottom_sheet);
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setDraggable(false);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     @Override
@@ -222,7 +223,7 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
         taskToUpdate.setPriority(binding.priorityNewTask.getText().toString());
         taskToUpdate.setTaskDate(selectedDate);
         taskToUpdate.setTaskTime(selectedTime);
-        adapter.generateItems();
+        adapter.updateTasksList();
         dismiss();
     }
 

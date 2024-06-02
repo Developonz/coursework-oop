@@ -4,9 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,29 +17,32 @@ import com.example.planner.databinding.FragmentTasksItemBinding;
 import com.example.planner.databinding.HeaderOldTasksListBinding;
 import com.example.planner.databinding.HeaderTasksListBinding;
 
-import java.lang.ref.WeakReference;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnItemHeaderOldRecyclerViewClickListener {
-
+public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnItemHeaderOldRecyclerViewClickListener, Filterable {
     private final List<Task> allTasks;
     private final List<Object> items;
+    private final List<Task> filteredList;
     private String category;
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_HEADER_OLD = 1;
     private static final int VIEW_TYPE_TASK = 2;
     private boolean isVisibleOldTasks = true;
     private OnItemTaskRecyclerClickListener listener;
+    private String filterTitle = "";
 
     public TasksRecyclerViewAdapter(List<Task> tasks, String category, OnItemTaskRecyclerClickListener listener) {
         allTasks = tasks;
         items = new ArrayList<>();
+        filteredList = new ArrayList<>();
+        filteredList.addAll(allTasks);
         this.category = category;
         this.listener = listener;
-        generateItems();
+        updateTasksList();
     }
 
     @Override
@@ -80,13 +86,21 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         return items.size();
     }
 
-    public void generateItems() {
+    public void updateTasksList() {
+        generateItems(filteredList);
+    }
+
+    private void generateItems(List<Task> list) {
+        Log.i("test", "generate");
         items.clear();
-        if (allTasks.isEmpty()) return;
-        allTasks.sort(Comparator.comparing(Task::getTaskDate));
+        if (list.isEmpty()) {
+            notifyDataSetChanged();
+            return;
+        }
+        list.sort(Comparator.comparing(Task::getTaskDate));
         List<Task> oldTask = new ArrayList<>();
         String currentHeader = "";
-        for (Task task : allTasks) {
+        for (Task task : list) {
             if (!task.getTaskDate().isBefore(LocalDate.now())) {
                 if (category.equals("Все") || task.getCategory().equals(category)) {
                     String taskDate = task.getStringDate();
@@ -115,23 +129,66 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     public void addItem(Task task) {
         allTasks.add(task);
-        generateItems();
+        filteredList.add(task);
+        updateTasksList();
+    }
+
+    public void removeItem(Task task) {
+        filteredList.remove(task);
+        allTasks.remove(task);
+        updateTasksList();
     }
 
     public void changeCategory(String category) {
         this.category = category;
-        generateItems();
+        updateTasksList();
     }
 
-    public int getTask(int position) {
-        return allTasks.indexOf(items.get(position));
+    public Task getTask(int position) {
+        if  (items.get(position) instanceof Task) {
+            return (Task) items.get(position);
+        }
+        return null;
     }
 
     @Override
     public void onItemHeaderOldClickListener() {
         isVisibleOldTasks = !isVisibleOldTasks;
-        generateItems();
+        updateTasksList();
     }
+
+    @Override
+    public Filter getFilter() {
+        return myFilter;
+    }
+
+    private final Filter myFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            filteredList.clear();
+            filterTitle = charSequence.toString();
+
+            if (charSequence == null || charSequence.length() == 0) {
+                filteredList.addAll(allTasks);
+                Log.i("test", "in char null");
+            } else {
+                Log.i("test", "in char not null");
+                for (Task task: allTasks) {
+                    if (task.getTitle().toLowerCase().contains(charSequence.toString().toLowerCase())) {
+                        filteredList.add(task);
+                    }
+                }
+            }
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredList;
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            updateTasksList();
+        }
+    };
 
     public static class HeaderHolder extends RecyclerView.ViewHolder {
         public final TextView header;

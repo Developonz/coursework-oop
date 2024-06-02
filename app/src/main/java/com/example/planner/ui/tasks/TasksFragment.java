@@ -5,15 +5,24 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,6 +32,7 @@ import com.example.planner.R;
 import com.example.planner.databinding.FragmentTasksBinding;
 import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
+
 
 public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickListener {
 
@@ -56,27 +66,61 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setupOptionsMenu();
         return binding.getRoot();
+    }
+
+    public void setupOptionsMenu() {
+        MenuHost menuHost = requireActivity();
+        menuHost.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                Log.i("test", "onCreateMenu called");
+                menuInflater.inflate(R.menu.main, menu);
+                MenuItem searchItem = menu.findItem(R.id.action_search);
+                SearchView searchView = (SearchView) searchItem.getActionView();
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        adapter.getFilter().filter(newText);
+                        return false;
+                    }
+                });
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                if (id == R.id.action_search) {
+                    return true;
+                } else if (id == R.id.action_sort) {
+                    return true;
+                }
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
     }
 
     @Override
     public void onItemCheckBoxClick(int position) {
-        int pos = adapter.getTask(position);
-        Task task = taskList.get(pos);
-        taskList.remove(pos);
-        adapter.generateItems();
+        Task task = adapter.getTask(position);
+        adapter.removeItem(task);
         Snackbar.make(recyclerView, "Выполнено", Snackbar.LENGTH_LONG)
                 .setAnchorView(((MainActivity) requireActivity()).findViewById(R.id.bottom_navigation))
                 .setAction("Отменить", v -> {
-                    taskList.add(pos, task);
-                    adapter.generateItems();
+                    adapter.addItem(task);
+                    adapter.updateTasksList();
                 }).show();
     }
 
     @Override
     public void onItemViewClick(int position) {
-        int pos = adapter.getTask(position);
-        Task task = taskList.get(pos);
+        Task task = adapter.getTask(position);
         BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = BottomSheetTaskMenuInfo.getInstance(adapter, task);
         if (bottomSheetTaskMenuInfo != null)
             bottomSheetTaskMenuInfo.show(getParentFragmentManager(), bottomSheetTaskMenuInfo.getTag());
@@ -84,19 +128,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
 
     private void setupToolbar() {
         View customToolbar = this.getLayoutInflater().inflate(R.layout.custom_toolbar_layout, null);
-
-        ActionBar actionBar = ((MainActivity) requireActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(false);
-            actionBar.setTitle("");
-        }
-
         toolbar.addView(customToolbar);
-
-        Drawable drawable = toolbar.getOverflowIcon();
-        if (drawable != null) {
-            drawable.setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.SRC_ATOP);
-        }
     }
 
     private void setupCategories() {
@@ -114,7 +146,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
         recyclerView.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
         adapter = new TasksRecyclerViewAdapter(taskList, (String) activeCategory.getText(), this);
         recyclerView.setAdapter(adapter);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TaskItemTouchHelper(adapter, recyclerView, taskList, getActivity()));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TaskItemTouchHelper(adapter, recyclerView, getActivity()));
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 

@@ -2,15 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="1"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/action_search"
+        android:title="Search"
+        app:showAsAction="collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        />
 
     <item
-        android:id="@+id/action_search"
-        android:orderInCategory="2"
-        android:title="Searching"
-        app:showAsAction="never"
+        android:id="@+id/action_sort"
+        android:title="Sorting"
+        app:showAsAction="collapseActionView"
         />
 </menu>

@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigation, navController);
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -71,12 +71,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        /*if(item.getItemId() == R.id.action_search) {
+        *//*if(item.getItemId() == R.id.action_search) {
             Intent intent = new Intent(this, SearchUsersActivity.class);
             startActivity(intent);
-        }*/
+        }*//*
         return true;
-    }
+    }*/
 
     @Override
     public boolean onSupportNavigateUp() {

@@ -19,14 +19,12 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     private TasksRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
-    private ArrayList<Task> taskList;
     private Context context;
 
-    public TaskItemTouchHelper(TasksRecyclerViewAdapter adapter, RecyclerView recyclerView, ArrayList<Task> taskList, Context context) {
+    public TaskItemTouchHelper(TasksRecyclerViewAdapter adapter, RecyclerView recyclerView, Context context) {
         super(0, ItemTouchHelper.LEFT);
         this.adapter = adapter;
         this.recyclerView = recyclerView;
-        this.taskList = taskList;
         this.context = context;
     }
 
@@ -47,17 +45,12 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
         final int position = viewHolder.getAdapterPosition();
-        final int pos = adapter.getTask(position);
-        Task task = taskList.get(pos);
-        taskList.remove(pos);
-        adapter.generateItems();
-        adapter.notifyDataSetChanged();
+        Task task = adapter.getTask(position);
+        adapter.removeItem(task);
         Snackbar.make(recyclerView, "Удалено", Snackbar.LENGTH_LONG)
                 .setAnchorView(((MainActivity) context).findViewById(R.id.bottom_navigation))
                 .setAction("Отменить", v -> {
-                    taskList.add(pos, task);
-                    adapter.generateItems();
-                    adapter.notifyDataSetChanged();
+                    adapter.addItem(task);
                 }).show();
     }
 

@@ -14,7 +14,6 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-
     <style name="AppBottomSheetDialogTheme"
         parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/AppBottomSheetDialogStyle</item>
@@ -26,7 +25,5 @@
     <style name="AppBottomSheetDialogStyle" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/bottom_sheet</item>
     </style>
-
-
 
 </resources>
