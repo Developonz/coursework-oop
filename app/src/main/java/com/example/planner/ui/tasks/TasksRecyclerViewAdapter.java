@@ -115,7 +115,6 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     public void addItem(Task task) {
         allTasks.add(task);
-        allTasks.sort(Comparator.comparing(Task::getTaskDate));
         generateItems();
     }
 

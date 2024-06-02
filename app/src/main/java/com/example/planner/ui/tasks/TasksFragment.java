@@ -65,13 +65,11 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
         Task task = taskList.get(pos);
         taskList.remove(pos);
         adapter.generateItems();
-        adapter.notifyDataSetChanged();
         Snackbar.make(recyclerView, "Выполнено", Snackbar.LENGTH_LONG)
                 .setAnchorView(((MainActivity) requireActivity()).findViewById(R.id.bottom_navigation))
                 .setAction("Отменить", v -> {
                     taskList.add(pos, task);
                     adapter.generateItems();
-                    adapter.notifyDataSetChanged();
                 }).show();
     }
 
