@@ -33,6 +33,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -45,6 +46,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.planner.databinding.ActivityMainBinding;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -61,22 +63,18 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = binding.appBarMain.bottomNavigation;
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupWithNavController(navigation, navController);
-    }
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        for (int i = 0; i < navigation.getMenu().size(); i++) {
+            MenuItem item = navigation.getMenu().getItem(i);
+            View actionView = findViewById(item.getItemId());
+            actionView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    return true;
+                }
+            });
+        }
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        *//*if(item.getItemId() == R.id.action_search) {
-            Intent intent = new Intent(this, SearchUsersActivity.class);
-            startActivity(intent);
-        }*//*
-        return true;
-    }*/
 
     @Override
     public boolean onSupportNavigateUp() {
