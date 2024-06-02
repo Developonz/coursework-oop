@@ -223,7 +223,6 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
         taskToUpdate.setTaskDate(selectedDate);
         taskToUpdate.setTaskTime(selectedTime);
         adapter.generateItems();
-        adapter.notifyDataSetChanged();
         dismiss();
     }
 

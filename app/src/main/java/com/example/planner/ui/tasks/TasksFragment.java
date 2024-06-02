@@ -24,7 +24,7 @@ import com.example.planner.databinding.FragmentTasksBinding;
 import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 
-public class TasksFragment extends Fragment implements OnItemRecyclerClickListener {
+public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickListener {
 
     private ArrayList<Button> categoriesBtn;
     private Button activeCategory;
