@@ -1,5 +1,6 @@
 package com.example.planner.ui.tasks;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -45,20 +46,23 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
     private Task taskToUpdate;
     private String selectedCategory;
     private String selectedPriority;
+    private Context context;
 
 
-    private BottomSheetTaskMenuInfo(TasksRecyclerViewAdapter adapter, String category) {
+    private BottomSheetTaskMenuInfo(Context context, TasksRecyclerViewAdapter adapter, String category) {
         this.adapter = adapter;
         selectedDate = LocalDate.now();
         selectedCategory = category;
+        this.context = context;
     }
 
-    private BottomSheetTaskMenuInfo(TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
+    private BottomSheetTaskMenuInfo(Context context, TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
         this.adapter = adapter;
         this.taskToUpdate = taskToUpdate;
         this.isUpdateMode = true;
         selectedDate = taskToUpdate.getTaskDate();
         selectedTime = taskToUpdate.getTaskTime();
+        this.context = context;
     }
 
 
@@ -96,19 +100,19 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
         isOpenedThis = false;
     }
 
-    public static BottomSheetTaskMenuInfo getInstance(TasksRecyclerViewAdapter adapter, String category) {
+    public static BottomSheetTaskMenuInfo getInstance(Context context, TasksRecyclerViewAdapter adapter, String category) {
         if (!isOpenedThis) {
             isOpenedThis = true;
-            return new BottomSheetTaskMenuInfo(adapter, category);
+            return new BottomSheetTaskMenuInfo(context, adapter, category);
         } else {
             return null;
         }
     }
 
-    public static BottomSheetTaskMenuInfo getInstance(TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
+    public static BottomSheetTaskMenuInfo getInstance(Context context, TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
         if (!isOpenedThis) {
             isOpenedThis = true;
-            return new BottomSheetTaskMenuInfo(adapter, taskToUpdate);
+            return new BottomSheetTaskMenuInfo(context, adapter, taskToUpdate);
         } else {
             return null;
         }
@@ -223,6 +227,8 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
         taskToUpdate.setPriority(binding.priorityNewTask.getText().toString());
         taskToUpdate.setTaskDate(selectedDate);
         taskToUpdate.setTaskTime(selectedTime);
+        DBWorker.updateItem(context, taskToUpdate);
+
         adapter.updateTasksList();
         dismiss();
     }

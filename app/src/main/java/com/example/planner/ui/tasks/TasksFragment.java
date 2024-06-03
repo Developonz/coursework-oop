@@ -44,13 +44,15 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = FragmentTasksBinding.inflate(this.getLayoutInflater());
+
+        DBWorker.getAllTasks((MainActivity) requireActivity(), taskList, false);
         setupToolbar();
         setupCategories();
         setupRecyclerView();
 
         binding.addTaskBtn.setOnClickListener(v -> {
             String categpry = activeCategory.equals("Все") ? "Без категории" : activeCategory;
-            BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = BottomSheetTaskMenuInfo.getInstance(adapter, categpry);
+            BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = BottomSheetTaskMenuInfo.getInstance((MainActivity) requireActivity(),adapter, categpry);
             if (bottomSheetTaskMenuInfo != null)
                 bottomSheetTaskMenuInfo.show(getParentFragmentManager(), "BottomSheetTaskMenu");
         });
@@ -103,26 +105,28 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     @Override
     public void onItemCheckBoxClick(int position) {
         Task task = adapter.getTask(position);
+        task.setStatus(true);
         adapter.removeItem(task);
         Snackbar.make(recyclerView, "Выполнено", Snackbar.LENGTH_LONG)
                 .setAnchorView(((MainActivity) requireActivity()).findViewById(R.id.bottom_navigation))
                 .setAction("Отменить", v -> {
                     adapter.addItem(task);
-                    adapter.updateTasksList();
+                    task.setStatus(false);
+                    DBWorker.updateItem((MainActivity) requireActivity(), task);
                 }).show();
+
     }
 
     @Override
     public void onItemViewClick(int position) {
         Task task = adapter.getTask(position);
-        BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = BottomSheetTaskMenuInfo.getInstance(adapter, task);
+        BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = BottomSheetTaskMenuInfo.getInstance((MainActivity) requireActivity(), adapter, task);
         if (bottomSheetTaskMenuInfo != null)
             bottomSheetTaskMenuInfo.show(getParentFragmentManager(), bottomSheetTaskMenuInfo.getTag());
     }
 
     private void setupToolbar() {
         toolbar = binding.toolbar;
-        toolbar.setTitle("Задачи");
         ((MainActivity) requireActivity()).setSupportActionBar(toolbar);
     }
 
@@ -152,7 +156,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     private void setupRecyclerView() {
         recyclerView = binding.list;
         recyclerView.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
-        adapter = new TasksRecyclerViewAdapter(taskList, activeCategory, this);
+        adapter = new TasksRecyclerViewAdapter((MainActivity) requireActivity(), taskList, activeCategory, this);
         recyclerView.setAdapter(adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TaskItemTouchHelper(adapter, recyclerView, getActivity()));
         itemTouchHelper.attachToRecyclerView(recyclerView);

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.planner.MainActivity;
 import com.example.planner.databinding.FragmentTasksItemBinding;
 import com.example.planner.databinding.HeaderOldTasksListBinding;
 import com.example.planner.databinding.HeaderTasksListBinding;
@@ -33,9 +35,11 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private static final int VIEW_TYPE_TASK = 2;
     private boolean isVisibleOldTasks = true;
     private OnItemTaskRecyclerClickListener listener;
+    private Context context;
     private String filterTitle = "";
 
-    public TasksRecyclerViewAdapter(List<Task> tasks, String category, OnItemTaskRecyclerClickListener listener) {
+    public TasksRecyclerViewAdapter(Context context, List<Task> tasks, String category, OnItemTaskRecyclerClickListener listener) {
+        this.context = context;
         allTasks = tasks;
         items = new ArrayList<>();
         filteredList = new ArrayList<>();
@@ -128,12 +132,20 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     public void addItem(Task task) {
+        if (!task.isStatus()) {
+            DBWorker.addItem(context, task);
+        }
         allTasks.add(task);
         filteredList.add(task);
         updateTasksList();
     }
 
     public void removeItem(Task task) {
+        if (task.isStatus()) {
+            DBWorker.updateItem(context, task);
+        } else {
+            DBWorker.removeItem(context, task);
+        }
         filteredList.remove(task);
         allTasks.remove(task);
         updateTasksList();
