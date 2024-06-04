@@ -1,35 +1,38 @@
-package com.example.planner.ui.tasks;
+package com.example.planner.utils;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.example.planner.controllers.DBWorker;
+import com.example.planner.models.Task;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskDatabaseManager {
+public class DatabaseImporterExporter {
 
-    private TaskDbHelper dbHelper;
     private Context context;
+    private boolean isSave = false;
 
-    public TaskDatabaseManager(Context context) {
+    public DatabaseImporterExporter(Context context) {
         this.context = context;
-        dbHelper = new TaskDbHelper(context);
     }
 
     public void exportDatabaseToJson(Uri uri) throws IOException {
@@ -38,32 +41,28 @@ public class TaskDatabaseManager {
         DBWorker.getAllTasks(context, tasks, true);
         Gson gson = new GsonBuilder().create();
         String json = gson.toJson(tasks);
-        Log.i("test", "export");
-
-        try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri);
-             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream)) {
-             outputStreamWriter.write(json);
+        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.getContentResolver().openOutputStream(uri))) {
+            outputStreamWriter.write(json);
         } catch (Exception e) {
-            Log.e("TaskDatabaseManager", "Ошибка при экспорте базы данных", e);
             throw new IOException("Ошибка при экспорте базы данных", e);
         }
     }
 
-    public void importDatabaseFromJson(Uri uri) throws IOException {
-        try {
-            InputStream inputStream = context.getContentResolver().openInputStream(uri);
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
+    public void importDatabaseFromJson(Uri uri, boolean isSaveDataImport) throws IOException {
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(context.getContentResolver().openInputStream(uri))))
+        {
             Gson gson = new GsonBuilder().create();
             Type taskListType = new TypeToken<ArrayList<Task>>() {}.getType();
             List<Task> importedTasks = gson.fromJson(bufferedReader, taskListType);
 
+            if (!isSaveDataImport) {
+                DBWorker.resetDataBase(context);
+            }
             for (Task task : importedTasks) {
                 DBWorker.addItem(context, task);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new IOException("Ошибка при импорте базы данных", e);
         }
     }
 
@@ -75,7 +74,6 @@ public class TaskDatabaseManager {
     }
 
     public void openFilePickerForExport(Activity activity, int requestCode) {
-        Log.i("test", "openExport");
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.setType("application/json");
         intent.addCategory(Intent.CATEGORY_OPENABLE);

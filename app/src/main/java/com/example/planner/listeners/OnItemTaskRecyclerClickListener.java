@@ -1,4 +1,4 @@
-package com.example.planner.ui.tasks;
+package com.example.planner.listeners;
 
 public interface OnItemTaskRecyclerClickListener {
     void onItemCheckBoxClick(int position);

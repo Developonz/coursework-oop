@@ -1,4 +1,4 @@
-package com.example.planner.ui.tasks;
+package com.example.planner.models;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

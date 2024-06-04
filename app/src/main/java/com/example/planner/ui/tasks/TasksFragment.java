@@ -1,5 +1,7 @@
 package com.example.planner.ui.tasks;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
@@ -20,12 +22,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import com.example.planner.MainActivity;
 import com.example.planner.R;
+import com.example.planner.controllers.DBWorker;
+import com.example.planner.controllers.TasksController;
 import com.example.planner.databinding.FragmentTasksBinding;
+import com.example.planner.listeners.OnItemTaskRecyclerClickListener;
+import com.example.planner.models.Task;
+import com.example.planner.models.TasksViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import java.util.List;
+
 
 public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickListener {
     private String activeCategory;
@@ -35,21 +45,21 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     private RecyclerView recyclerView;
     private Toolbar toolbar;
     private TabLayout tabLayout;
-    private TasksViewModel tasksViewModel;
+    private TasksController controller;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = FragmentTasksBinding.inflate(this.getLayoutInflater());
-        tasksViewModel = new ViewModelProvider(requireActivity()).get(TasksViewModel.class);
-        tasksViewModel.updateListValue(requireActivity());
+        controller = new TasksController(requireActivity(), new ViewModelProvider(requireActivity()).get(TasksViewModel.class));
+        controller.loadTasks();
 
         setupToolbar();
         setupCategories();
         setupRecyclerView();
 
-        tasksViewModel.getList().observe(this, new Observer<List<Task>>() {
+        controller.getViewModel().getList().observe(this, new Observer<List<Task>>() {
             @Override
             public void onChanged(List<Task> tasks) {
                 Log.d("test", "changedInFragment");
@@ -64,7 +74,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
 
     private void openTaskMenu() {
         String category = activeCategory.equals("Все") ? "Без категории" : activeCategory;
-        BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = BottomSheetTaskMenuInfo.getInstance((MainActivity) requireActivity(), adapter, category);
+        BottomSheetTaskMenu bottomSheetTaskMenuInfo = BottomSheetTaskMenu.getInstance((MainActivity) requireActivity(), adapter, category);
         if (bottomSheetTaskMenuInfo != null) {
             bottomSheetTaskMenuInfo.show(getParentFragmentManager(), "BottomSheetTaskMenu");
         }
@@ -122,7 +132,6 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
                 .setAnchorView(((MainActivity) requireActivity()).findViewById(R.id.bottom_navigation))
                 .setAction("Отменить", v -> {
                     adapter.addItem(task);
-                    task.setStatus(false);
                     DBWorker.updateItem((MainActivity) requireActivity(), task);
                 }).show();
     }
@@ -130,7 +139,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     @Override
     public void onItemViewClick(int position) {
         Task task = adapter.getTask(position);
-        BottomSheetTaskMenuInfo bottomSheetTaskMenuInfo = BottomSheetTaskMenuInfo.getInstance((MainActivity) requireActivity(), adapter, task);
+        BottomSheetTaskMenu bottomSheetTaskMenuInfo = BottomSheetTaskMenu.getInstance((MainActivity) requireActivity(), adapter, task);
         if (bottomSheetTaskMenuInfo != null)
             bottomSheetTaskMenuInfo.show(getParentFragmentManager(), bottomSheetTaskMenuInfo.getTag());
     }
@@ -167,7 +176,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     private void setupRecyclerView() {
         recyclerView = binding.list;
         recyclerView.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
-        adapter = new TasksRecyclerViewAdapter((MainActivity) requireActivity(), activeCategory, this, tasksViewModel);
+        adapter = new TasksRecyclerViewAdapter(activeCategory, this, controller);
         recyclerView.setAdapter(adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TaskItemTouchHelper(adapter, recyclerView, getActivity()));
         itemTouchHelper.attachToRecyclerView(recyclerView);

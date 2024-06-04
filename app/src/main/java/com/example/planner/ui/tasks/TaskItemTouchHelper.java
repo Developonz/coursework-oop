@@ -8,12 +8,12 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.planner.MainActivity;
 import com.example.planner.R;
+import com.example.planner.models.Task;
 import com.google.android.material.snackbar.Snackbar;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
-import java.util.ArrayList;
+
 
 public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
@@ -69,7 +69,7 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     @Override
     public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
-        return 0.6f;
+        return 0.5f;
     }
 
     @Override

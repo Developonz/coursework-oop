@@ -1,13 +1,15 @@
-package com.example.planner.ui.tasks;
+package com.example.planner.models;
 
 import android.content.Context;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.planner.controllers.DBWorker;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 public class TasksViewModel extends ViewModel {
 
@@ -26,10 +28,10 @@ public class TasksViewModel extends ViewModel {
         return tasksList;
     }
 
-    public void updateListValue(Context context) {
-        ArrayList<Task> array =  new ArrayList<>();
-        DBWorker.getAllTasks(context, array, false);
-        tasksList.setValue(array);
+    /*public void updateListValue(Context context) {
+        tasksList.getValue().clear();
+        DBWorker.getAllTasks(context, tasksList.getValue(), false);
+        tasksList.setValue(tasksList.getValue());
     }
 
     public void addTask(Context context, Task newTask) {
@@ -52,5 +54,5 @@ public class TasksViewModel extends ViewModel {
             tasksList.getValue().remove(task);;
         }
         tasksList.setValue(tasksList.getValue());
-    }
+    }*/
 }

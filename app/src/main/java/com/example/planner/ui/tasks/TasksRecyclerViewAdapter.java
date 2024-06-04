@@ -1,10 +1,7 @@
 package com.example.planner.ui.tasks;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
@@ -16,15 +13,17 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.planner.MainActivity;
+import com.example.planner.controllers.TasksController;
 import com.example.planner.databinding.FragmentTasksItemBinding;
 import com.example.planner.databinding.HeaderOldTasksListBinding;
 import com.example.planner.databinding.HeaderTasksListBinding;
+import com.example.planner.listeners.OnItemHeaderOldRecyclerViewClickListener;
+import com.example.planner.listeners.OnItemTaskRecyclerClickListener;
+import com.example.planner.models.Task;
+import com.example.planner.models.TasksViewModel;
 
-import java.security.acl.Owner;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -38,14 +37,14 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private boolean isVisibleOldTasks = true;
     private OnItemTaskRecyclerClickListener listener;
     private Context context;
-    private TasksViewModel tasksViewModel;
+    private TasksController controller;
 
-    public TasksRecyclerViewAdapter(Context context, String category, OnItemTaskRecyclerClickListener listener, TasksViewModel tasksViewModel) {
-        this.tasksViewModel = tasksViewModel;
+    public TasksRecyclerViewAdapter(String category, OnItemTaskRecyclerClickListener listener, TasksController controller) {
+        this.controller = controller;
         this.context = context;
         items = new ArrayList<>();
         filteredList = new ArrayList<>();
-        filteredList.addAll(tasksViewModel.getListValue());
+        filteredList.addAll(controller.getTasks());
         this.category = category;
         this.listener = listener;
         updateTasksList();
@@ -98,6 +97,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
             notifyDataSetChanged();
             return;
         }
+        filteredList.sort(Comparator.comparing(Task::getTitle));
         filteredList.sort(Comparator.comparing(Task::getTaskDate));
         List<Task> oldTask = new ArrayList<>();
         String currentHeader = "";
@@ -130,29 +130,21 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     public void resetTasksList() {
         filteredList.clear();
-        filteredList.addAll(tasksViewModel.getListValue());
+        filteredList.addAll(controller.getTasks());
         updateTasksList();
     }
 
 
     public void addItem(Task task) {
-        /*if (!task.isStatus()) {
-            DBWorker.addItem(context, task);
-        }
-        allTasks.add(task);*/
         filteredList.add(task);
-        tasksViewModel.addTask(context, task);
+        controller.addTask(task);
+        updateTasksList();
     }
 
     public void removeItem(Task task) {
-        /*if (task.isStatus()) {
-            DBWorker.updateItem(context, task);
-        } else {
-            DBWorker.removeItem(context, task);
-        }
-        allTasks.remove(task);*/
         filteredList.remove(task);
-        tasksViewModel.removeTask(context, task);
+        controller.removeTask(task);
+        updateTasksList();
     }
 
     public void changeCategory(String category) {
@@ -184,11 +176,11 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
             filteredList.clear();
 
             if (charSequence == null || charSequence.length() == 0) {
-                filteredList.addAll(tasksViewModel.getListValue());
+                filteredList.addAll(controller.getTasks());
                 Log.i("test", "in char null");
             } else {
                 Log.i("test", "in char not null");
-                for (Task task: tasksViewModel.getListValue()) {
+                for (Task task: controller.getTasks()) {
                     if (task.getTitle().toLowerCase().contains(charSequence.toString().toLowerCase())) {
                         filteredList.add(task);
                     }

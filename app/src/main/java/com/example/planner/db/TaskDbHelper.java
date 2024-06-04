@@ -1,4 +1,4 @@
-package com.example.planner.ui.tasks;
+package com.example.planner.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class TaskDbHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "task1.db";
+    private static final String DATABASE_NAME = "task.db";
     private static final int DATABASE_VERSION = 1;
 
     public static final String TABLE_TASK = "task";

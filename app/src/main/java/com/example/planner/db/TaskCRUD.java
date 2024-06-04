@@ -1,17 +1,22 @@
-package com.example.planner.ui.tasks;
+package com.example.planner.db;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.example.planner.models.Task;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class TaskCRUD {
 
     private SQLiteDatabase db;
+
     private TaskDbHelper dbHelper;
 
     public TaskCRUD(Context context) {
@@ -111,5 +116,9 @@ public class TaskCRUD {
         String category = cursor.getString(cursor.getColumnIndexOrThrow(TaskDbHelper.COLUMN_CATEGORY));
         boolean status = cursor.getInt(cursor.getColumnIndexOrThrow(TaskDbHelper.COLUMN_STATUS)) == 1;
         return new Task(title, taskDate, taskTime, priority, category, status, id);
+    }
+
+    public void resetDataBase() {
+        dbHelper.onUpgrade(db, 1, 1);
     }
 }

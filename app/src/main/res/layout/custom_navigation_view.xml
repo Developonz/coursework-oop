@@ -4,66 +4,53 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
     <LinearLayout
-        android:id="@+id/menu_container"
+        android:id="@+id/sub_menu_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:foregroundTint="@android:color/darker_gray"
         android:padding="16dp">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
         <TextView
-            android:id="@+id/menu_item_1"
+            android:id="@+id/sub_menu_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Элемент 1"
-            android:textSize="18sp"
+            android:text="Подэлемент 1"
+            android:textSize="16sp"
             android:padding="10dp"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sub_menu_container1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
         <TextView
-            android:id="@+id/menu_item_2"
+            android:id="@+id/sub_menu_item_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Элемент 2"
-            android:textSize="18sp"
-            android:padding="10dp"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
-            android:focusable="true" />
-
-        <LinearLayout
-            android:id="@+id/sub_menu_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/sub_menu_item_1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Подэлемент 1"
-                android:textSize="16sp"
-                android:padding="10dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true" />
-
-            <TextView
-                android:id="@+id/sub_menu_item_2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Подэлемент 2"
-                android:textSize="16sp"
-                android:padding="10dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true" />
-
-        </LinearLayout>
+            android:focusable="true"
+            android:padding="10dp"
+            android:text="Подэлемент 2"
+            android:textSize="16sp" />
 
     </LinearLayout>
 

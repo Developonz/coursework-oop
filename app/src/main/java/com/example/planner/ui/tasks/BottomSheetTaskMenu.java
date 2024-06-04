@@ -20,7 +20,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.example.planner.R;
+import com.example.planner.controllers.DBWorker;
 import com.example.planner.databinding.TaskMenuInfoBinding;
+import com.example.planner.models.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -33,8 +35,11 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
+
+public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
     private static boolean isOpenedThis = false;
     private TaskMenuInfoBinding binding;
     private LocalDate selectedDate;
@@ -47,16 +52,17 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
     private String selectedCategory;
     private String selectedPriority;
     private Context context;
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 
-    private BottomSheetTaskMenuInfo(Context context, TasksRecyclerViewAdapter adapter, String category) {
+    private BottomSheetTaskMenu(Context context, TasksRecyclerViewAdapter adapter, String category) {
         this.adapter = adapter;
         selectedDate = LocalDate.now();
         selectedCategory = category;
         this.context = context;
     }
 
-    private BottomSheetTaskMenuInfo(Context context, TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
+    private BottomSheetTaskMenu(Context context, TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
         this.adapter = adapter;
         this.taskToUpdate = taskToUpdate;
         this.isUpdateMode = true;
@@ -100,19 +106,19 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
         isOpenedThis = false;
     }
 
-    public static BottomSheetTaskMenuInfo getInstance(Context context, TasksRecyclerViewAdapter adapter, String category) {
+    public static BottomSheetTaskMenu getInstance(Context context, TasksRecyclerViewAdapter adapter, String category) {
         if (!isOpenedThis) {
             isOpenedThis = true;
-            return new BottomSheetTaskMenuInfo(context, adapter, category);
+            return new BottomSheetTaskMenu(context, adapter, category);
         } else {
             return null;
         }
     }
 
-    public static BottomSheetTaskMenuInfo getInstance(Context context, TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
+    public static BottomSheetTaskMenu getInstance(Context context, TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
         if (!isOpenedThis) {
             isOpenedThis = true;
-            return new BottomSheetTaskMenuInfo(context, adapter, taskToUpdate);
+            return new BottomSheetTaskMenu(context, adapter, taskToUpdate);
         } else {
             return null;
         }
@@ -161,7 +167,6 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
                 selectedPriority = getResources().getStringArray(R.array.priorities)[0];
             }
         }
-        updateDropDownLists();
 
         binding.dateTVBS.setText(selectedDate.toString());
         if (selectedTime != null) {
@@ -186,31 +191,42 @@ public class BottomSheetTaskMenuInfo extends BottomSheetDialogFragment {
         binding.dateLL.setOnClickListener(v -> openDatePicker());
         binding.timeLL.setOnClickListener(v -> openTimePicker());
         binding.removeTime.setOnClickListener(v -> resetTime());
+
+        // Асинхронная инициализация
+        initializeViewsAsync();
     }
 
-    private void updateDropDownLists() {
-        Log.i("test", "updateDropDown");
-        setupDropDown(binding.categoryNewTask, R.array.categories, selectedCategory);
-        setupDropDown(binding.priorityNewTask, R.array.priorities, selectedPriority);
+    private void initializeViewsAsync() {
+        executor.execute(() -> {
+            String[] categories = getResources().getStringArray(R.array.categories);
+            String[] priorities = getResources().getStringArray(R.array.priorities);
+
+            getActivity().runOnUiThread(() -> {
+                setupDropDown(binding.categoryNewTask, categories, selectedCategory);
+                setupDropDown(binding.priorityNewTask, priorities, selectedPriority);
+            });
+        });
     }
 
-    private void setupDropDown(AutoCompleteTextView autoCompleteTextView, int arrayResourceId, String selectedItem) {
-        String[] items = getResources().getStringArray(arrayResourceId);
+    private void setupDropDown(AutoCompleteTextView autoCompleteTextView, String[] items, String selectedItem) {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, items);
         autoCompleteTextView.setAdapter(adapter);
         autoCompleteTextView.setText(selectedItem, false);
-        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItem = (String) parent.getItemAtPosition(position);
-                if (arrayResourceId == R.array.categories) {
-                    selectedCategory = selectedItem;
-                } else if (arrayResourceId == R.array.priorities) {
-                    selectedPriority = selectedItem;
-                }
+        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedItem1 = (String) parent.getItemAtPosition(position);
+            if (autoCompleteTextView == binding.categoryNewTask) {
+                selectedCategory = selectedItem1;
+            } else if (autoCompleteTextView == binding.priorityNewTask) {
+                selectedPriority = selectedItem1;
             }
         });
     }
+
+    /*private void updateDropDownLists() {
+        Log.i("test", "updateDropDown");
+        setupDropDown(binding.categoryNewTask, R.array.categories, selectedCategory);
+        setupDropDown(binding.priorityNewTask, R.array.priorities, selectedPriority);
+    }*/
 
     private void createTask() {
         String title = binding.titleNewTask.getText().toString();

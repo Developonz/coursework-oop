@@ -2,6 +2,8 @@ package com.example.planner;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -10,9 +12,13 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-import com.example.planner.ui.tasks.Task;
-import com.example.planner.ui.tasks.TaskDatabaseManager;
-import com.example.planner.ui.tasks.TasksViewModel;
+
+import com.example.planner.R;
+import com.example.planner.controllers.TasksController;
+import com.example.planner.databinding.ActivityMainBinding;
+import com.example.planner.models.Task;
+import com.example.planner.models.TasksViewModel;
+import com.example.planner.utils.DatabaseImporterExporter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -25,7 +31,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.planner.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
 import java.io.File;
 import java.io.IOException;
@@ -34,13 +39,14 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
-    private TasksViewModel tasksViewModel;
+    private TasksController controller;
+    private boolean isSaveDataImport = true;
 
     private static final int REQUEST_CODE_IMPORT = 1;
     private static final int REQUEST_CODE_EXPORT = 2;
     private static final int REQUEST_CODE_WRITE_PERMISSION = 3;
 
-    TaskDatabaseManager taskDatabaseManager = new TaskDatabaseManager(this);
+    DatabaseImporterExporter taskDatabaseManager = new DatabaseImporterExporter(this);
 
 
     @Override
@@ -63,13 +69,8 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        tasksViewModel = new ViewModelProvider(this).get(TasksViewModel.class);
-        tasksViewModel.getList().observe(this, new Observer<List<Task>>() {
-            @Override
-            public void onChanged(List<Task> tasks) {
-                Log.d("test", "changed");
-            }
-        });
+        controller = new TasksController(this, new ViewModelProvider(this).get(TasksViewModel.class));
+
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(item -> {
@@ -84,17 +85,41 @@ public class MainActivity extends AppCompatActivity {
                 taskDatabaseManager.openFilePickerForExport(this, REQUEST_CODE_EXPORT);
                 return true;
             } else  if (id == R.id.import_json) {
-                taskDatabaseManager.openFilePickerForImport(this, REQUEST_CODE_IMPORT);
+                closeDrawer();
+                getImportMode(this);
                 return true;
             }
             return false;
         });
-
     }
 
     public void openDrawer(MenuItem item) {
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.openDrawer(GravityCompat.START);
+    }
+
+    public void closeDrawer() {
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    private void getImportMode(Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Импорт");
+        builder.setMessage("Вы хотите оставить прежние данные?");
+        builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                isSaveDataImport = true;
+                taskDatabaseManager.openFilePickerForImport(activity, REQUEST_CODE_IMPORT);
+            }
+        });
+        builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                isSaveDataImport = false;
+                taskDatabaseManager.openFilePickerForImport(activity, REQUEST_CODE_IMPORT);
+            }
+        });
+        builder.create().show();
     }
 
     @Override
@@ -107,9 +132,8 @@ public class MainActivity extends AppCompatActivity {
             if (uri != null) {
                 if (requestCode == REQUEST_CODE_IMPORT) {
                     try {
-                        File file = new File(uri.getPath());
-                        taskDatabaseManager.importDatabaseFromJson(uri);
-                        tasksViewModel.updateListValue(this.getApplicationContext());
+                        taskDatabaseManager.importDatabaseFromJson(uri, isSaveDataImport);
+                        controller.loadTasks();
                         Toast.makeText(this, "Импорт завершен", Toast.LENGTH_SHORT).show();
                     } catch (IOException e) {
                         e.printStackTrace();
