@@ -1,27 +1,46 @@
 package com.example.planner;
 
-import android.content.Context;
+import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-
+import android.widget.Toast;
 import com.example.planner.ui.tasks.Task;
-import com.example.planner.ui.tasks.TaskCRUD;
+import com.example.planner.ui.tasks.TaskDatabaseManager;
+import com.example.planner.ui.tasks.TasksViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import androidx.appcompat.widget.SearchView;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.planner.databinding.ActivityMainBinding;
+import com.google.android.material.navigation.NavigationView;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
+    private TasksViewModel tasksViewModel;
+
+    private static final int REQUEST_CODE_IMPORT = 1;
+    private static final int REQUEST_CODE_EXPORT = 2;
+    private static final int REQUEST_CODE_WRITE_PERMISSION = 3;
+
+    TaskDatabaseManager taskDatabaseManager = new TaskDatabaseManager(this);
 
 
     @Override
@@ -43,10 +62,70 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+
+        tasksViewModel = new ViewModelProvider(this).get(TasksViewModel.class);
+        tasksViewModel.getList().observe(this, new Observer<List<Task>>() {
+            @Override
+            public void onChanged(List<Task> tasks) {
+                Log.d("test", "changed");
+            }
+        });
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.export_json) {
+                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            REQUEST_CODE_WRITE_PERMISSION);
+                }
+                taskDatabaseManager.openFilePickerForExport(this, REQUEST_CODE_EXPORT);
+                return true;
+            } else  if (id == R.id.import_json) {
+                taskDatabaseManager.openFilePickerForImport(this, REQUEST_CODE_IMPORT);
+                return true;
+            }
+            return false;
+        });
+
     }
 
     public void openDrawer(MenuItem item) {
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.openDrawer(GravityCompat.START);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            Uri uri = data.getData();
+
+            if (uri != null) {
+                if (requestCode == REQUEST_CODE_IMPORT) {
+                    try {
+                        File file = new File(uri.getPath());
+                        taskDatabaseManager.importDatabaseFromJson(uri);
+                        tasksViewModel.updateListValue(this.getApplicationContext());
+                        Toast.makeText(this, "Импорт завершен", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(this, "Ошибка импорта", Toast.LENGTH_SHORT).show();
+                    }
+                } else if (requestCode == REQUEST_CODE_EXPORT) {
+                    try {
+                        taskDatabaseManager.exportDatabaseToJson(uri);
+                        Toast.makeText(this, "Экспорт завершен", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(this, "Ошибка экспорта", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+    }
+
 }

@@ -1,6 +1,8 @@
 package com.example.planner.ui.tasks;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
@@ -19,6 +21,7 @@ import com.example.planner.databinding.FragmentTasksItemBinding;
 import com.example.planner.databinding.HeaderOldTasksListBinding;
 import com.example.planner.databinding.HeaderTasksListBinding;
 
+import java.security.acl.Owner;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +29,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnItemHeaderOldRecyclerViewClickListener, Filterable {
-    private final List<Task> allTasks;
     private final List<Object> items;
     private final List<Task> filteredList;
     private String category;
@@ -36,14 +38,14 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private boolean isVisibleOldTasks = true;
     private OnItemTaskRecyclerClickListener listener;
     private Context context;
-    private String filterTitle = "";
+    private TasksViewModel tasksViewModel;
 
-    public TasksRecyclerViewAdapter(Context context, List<Task> tasks, String category, OnItemTaskRecyclerClickListener listener) {
+    public TasksRecyclerViewAdapter(Context context, String category, OnItemTaskRecyclerClickListener listener, TasksViewModel tasksViewModel) {
+        this.tasksViewModel = tasksViewModel;
         this.context = context;
-        allTasks = tasks;
         items = new ArrayList<>();
         filteredList = new ArrayList<>();
-        filteredList.addAll(allTasks);
+        filteredList.addAll(tasksViewModel.getListValue());
         this.category = category;
         this.listener = listener;
         updateTasksList();
@@ -91,20 +93,15 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     public void updateTasksList() {
-        generateItems(filteredList);
-    }
-
-    private void generateItems(List<Task> list) {
-        Log.i("test", "generate");
         items.clear();
-        if (list.isEmpty()) {
+        if (filteredList.isEmpty()) {
             notifyDataSetChanged();
             return;
         }
-        list.sort(Comparator.comparing(Task::getTaskDate));
+        filteredList.sort(Comparator.comparing(Task::getTaskDate));
         List<Task> oldTask = new ArrayList<>();
         String currentHeader = "";
-        for (Task task : list) {
+        for (Task task : filteredList) {
             if (!task.getTaskDate().isBefore(LocalDate.now())) {
                 if (category.equals("Все") || task.getCategory().equals(category)) {
                     String taskDate = task.getStringDate();
@@ -131,24 +128,31 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         notifyDataSetChanged();
     }
 
-    public void addItem(Task task) {
-        if (!task.isStatus()) {
-            DBWorker.addItem(context, task);
-        }
-        allTasks.add(task);
-        filteredList.add(task);
+    public void resetTasksList() {
+        filteredList.clear();
+        filteredList.addAll(tasksViewModel.getListValue());
         updateTasksList();
     }
 
+
+    public void addItem(Task task) {
+        /*if (!task.isStatus()) {
+            DBWorker.addItem(context, task);
+        }
+        allTasks.add(task);*/
+        filteredList.add(task);
+        tasksViewModel.addTask(context, task);
+    }
+
     public void removeItem(Task task) {
-        if (task.isStatus()) {
+        /*if (task.isStatus()) {
             DBWorker.updateItem(context, task);
         } else {
             DBWorker.removeItem(context, task);
         }
+        allTasks.remove(task);*/
         filteredList.remove(task);
-        allTasks.remove(task);
-        updateTasksList();
+        tasksViewModel.removeTask(context, task);
     }
 
     public void changeCategory(String category) {
@@ -178,14 +182,13 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         @Override
         protected FilterResults performFiltering(CharSequence charSequence) {
             filteredList.clear();
-            filterTitle = charSequence.toString();
 
             if (charSequence == null || charSequence.length() == 0) {
-                filteredList.addAll(allTasks);
+                filteredList.addAll(tasksViewModel.getListValue());
                 Log.i("test", "in char null");
             } else {
                 Log.i("test", "in char not null");
-                for (Task task: allTasks) {
+                for (Task task: tasksViewModel.getListValue()) {
                     if (task.getTitle().toLowerCase().contains(charSequence.toString().toLowerCase())) {
                         filteredList.add(task);
                     }

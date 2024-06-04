@@ -3,6 +3,7 @@ package com.example.planner.ui.tasks;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DBWorker {
 
@@ -27,7 +28,7 @@ public class DBWorker {
         taskCRUD.close();
     }
 
-    public static void getAllTasks(Context context, ArrayList<Task> list, boolean status) {
+    public static void getAllTasks(Context context, List<Task> list, boolean status) {
         TaskCRUD taskCRUD = new TaskCRUD(context);
         taskCRUD.open();
         list.addAll(taskCRUD.getAllTasks(status));
