@@ -1,11 +1,12 @@
 package com.example.planner.controllers;
 
 import android.content.Context;
-
+import com.example.planner.R;
 import com.example.planner.models.Task;
 import com.example.planner.models.TasksViewModel;
-
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class TasksController {
     private final Context context;
@@ -51,6 +52,29 @@ public class TasksController {
         getTasks().clear();
         DBWorker.getAllTasks(context, getTasks(), false);
         viewModel.getList().setValue(viewModel.getList().getValue());
+    }
+
+    public void sortTasksTitle(ArrayList<Task> list, boolean direction, boolean isDate) {
+        if (direction) {
+            list.sort(Comparator.comparing(Task::getTitle));
+        } else {
+            list.sort(Comparator.comparing(Task::getTitle).reversed());
+        }
+        if (isDate) {
+            list.sort(Comparator.comparing(Task::getTaskDate));
+        }
+    }
+
+    public void sortTasksPriority(ArrayList<Task> list, boolean direction, boolean isDate) {
+        String[] priorities = context.getResources().getStringArray(R.array.priorities);
+        if (direction) {
+            list.sort(Comparator.comparingInt(item -> priorities.length - Arrays.asList(priorities).indexOf(item.getPriority()) - 1));
+        } else {
+            list.sort(Comparator.comparingInt(item -> Arrays.asList(priorities).indexOf(item.getPriority())));
+        }
+        if (isDate) {
+            list.sort(Comparator.comparing(Task::getTaskDate));
+        }
     }
 
     public Context getContext() {

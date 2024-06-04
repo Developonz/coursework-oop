@@ -192,7 +192,6 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
         binding.timeLL.setOnClickListener(v -> openTimePicker());
         binding.removeTime.setOnClickListener(v -> resetTime());
 
-        // Асинхронная инициализация
         initializeViewsAsync();
     }
 

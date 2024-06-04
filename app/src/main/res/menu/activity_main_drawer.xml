@@ -2,11 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="nav_view">
-    <item
-        android:id="@+id/export_json"
-        android:title="Экспортировать" />
-    <item
-        android:id="@+id/import_json"
-        android:title="Импортировать" />
+    <item android:title="Данные" >
+        <menu>
+            <item
+                android:id="@+id/import_json"
+                android:icon="@drawable/download"
+                android:title="Импортировать" />
 
+            <item
+                android:id="@+id/export_json"
+                android:icon="@drawable/upload"
+                android:title="Экспортировать" />
+        </menu>
+    </item>
 </menu>

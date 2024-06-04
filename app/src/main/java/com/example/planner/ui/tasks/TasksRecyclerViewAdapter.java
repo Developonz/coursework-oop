@@ -38,6 +38,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private OnItemTaskRecyclerClickListener listener;
     private Context context;
     private TasksController controller;
+    private int numberSort = 0;
 
     public TasksRecyclerViewAdapter(String category, OnItemTaskRecyclerClickListener listener, TasksController controller) {
         this.controller = controller;
@@ -97,9 +98,9 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
             notifyDataSetChanged();
             return;
         }
-        filteredList.sort(Comparator.comparing(Task::getTitle));
-        filteredList.sort(Comparator.comparing(Task::getTaskDate));
-        List<Task> oldTask = new ArrayList<>();
+
+        sortItems((ArrayList<Task>) filteredList, true);
+        ArrayList<Task> oldTask = new ArrayList<>();
         String currentHeader = "";
         for (Task task : filteredList) {
             if (!task.getTaskDate().isBefore(LocalDate.now())) {
@@ -118,6 +119,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         if (!oldTask.isEmpty()) {
             items.add("Old");
             if (isVisibleOldTasks) {
+                sortItems(oldTask, false);
                 for (Task task : oldTask) {
                     if (category.equals("Все") || task.getCategory().equals(category)) {
                         items.add(task);
@@ -134,6 +136,17 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         updateTasksList();
     }
 
+    public void sortItems(int numberSort) {
+        this.numberSort = numberSort;
+        updateTasksList();
+    }
+    public void sortItems(ArrayList<Task> list, boolean isDate) {
+        if (numberSort < 2) {
+            controller.sortTasksTitle(list, numberSort % 2 == 0, isDate);
+        } else {
+            controller.sortTasksPriority(list, numberSort % 2 == 0, isDate);
+        }
+    }
 
     public void addItem(Task task) {
         filteredList.add(task);

@@ -46,6 +46,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private TasksController controller;
+    private SortDialog sortDialog;
 
 
     @Override
@@ -54,6 +55,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
         binding = FragmentTasksBinding.inflate(this.getLayoutInflater());
         controller = new TasksController(requireActivity(), new ViewModelProvider(requireActivity()).get(TasksViewModel.class));
         controller.loadTasks();
+        sortDialog = new SortDialog(requireActivity());
 
         setupToolbar();
         setupCategories();
@@ -69,7 +71,11 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
 
         binding.addTaskBtn.setOnClickListener(v -> openTaskMenu());
     }
-
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setupOptionsMenu();
+        return binding.getRoot();
+    }
 
 
     private void openTaskMenu() {
@@ -80,11 +86,6 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
         }
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setupOptionsMenu();
-        return binding.getRoot();
-    }
 
     public void setupOptionsMenu() {
         MenuHost menuHost = requireActivity();
@@ -115,6 +116,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
                 if (id == R.id.action_search) {
                     return true;
                 } else if (id == R.id.action_sort) {
+                    sortDialog.showDialog(adapter);
                     return true;
                 }
                 return false;
