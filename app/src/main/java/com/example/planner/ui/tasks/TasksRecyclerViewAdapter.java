@@ -113,7 +113,9 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     items.add(task);
                 }
             } else {
-                oldTask.add(task);
+                if (category.equals("Все") || task.getCategory().equals(category)) {
+                    oldTask.add(task);
+                }
             }
         }
         if (!oldTask.isEmpty()) {

@@ -164,6 +164,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 activeCategory = (String) tab.getText();
+                adapter.changeCategory(activeCategory);
             }
 
             @Override
