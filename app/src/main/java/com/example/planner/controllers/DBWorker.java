@@ -1,16 +1,16 @@
 package com.example.planner.controllers;
 
+import android.app.AlarmManager;
 import android.content.Context;
 import com.example.planner.db.TaskCRUD;
 import com.example.planner.models.Task;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import com.example.planner.utils.AlarmManagerNot;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBWorker {
-
-    private static final Executor executor = Executors.newSingleThreadExecutor();
 
     public static void addItem(Context context, Task task) {
             TaskCRUD taskCRUD = new TaskCRUD(context);
@@ -43,7 +43,17 @@ public class DBWorker {
     public static void resetDataBase(Context context) {
         TaskCRUD taskCRUD = new TaskCRUD(context);
         taskCRUD.open();
+        ArrayList<Task> list = new ArrayList<>();
+        getAllTasks(context, list, false);
         taskCRUD.resetDataBase();
         taskCRUD.close();
+    }
+
+    public static Task getTask(Context context, long id) {
+        TaskCRUD taskCRUD = new TaskCRUD(context);
+        taskCRUD.open();
+        Task task = taskCRUD.getTask(id);
+        taskCRUD.close();
+        return task;
     }
 }

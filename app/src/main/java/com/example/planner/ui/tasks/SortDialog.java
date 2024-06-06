@@ -40,6 +40,7 @@ public class SortDialog {
             }
         });
 
+
         AlertDialog dialog = builder.create();
         dialog.show();
     }

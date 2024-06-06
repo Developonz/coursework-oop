@@ -160,6 +160,12 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         updateTasksList();
     }
 
+    public void updateTask(Task task) {
+        controller.updateTask(task);
+        updateTasksList();
+    }
+
+
     public void changeCategory(String category) {
         this.category = category;
         updateTasksList();
@@ -209,6 +215,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
             updateTasksList();
         }
     };
+
 
     public static class HeaderHolder extends RecyclerView.ViewHolder {
         public final TextView header;

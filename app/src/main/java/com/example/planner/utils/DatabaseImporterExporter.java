@@ -1,7 +1,11 @@
 package com.example.planner.utils;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.planner.controllers.DBWorker;
+import com.example.planner.controllers.TasksController;
 import com.example.planner.models.Task;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -23,16 +28,18 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseImporterExporter {
 
     private Context context;
-    private boolean isSave = false;
+    private TasksController controller;
 
-    public DatabaseImporterExporter(Context context) {
-        this.context = context;
+    public DatabaseImporterExporter(TasksController controller) {
+        this.controller = controller;
+        this.context = controller.getContext();
     }
 
     public void exportDatabaseToJson(Uri uri) throws IOException {
@@ -56,10 +63,11 @@ public class DatabaseImporterExporter {
             List<Task> importedTasks = gson.fromJson(bufferedReader, taskListType);
 
             if (!isSaveDataImport) {
-                DBWorker.resetDataBase(context);
+                controller.resetData();
             }
             for (Task task : importedTasks) {
                 DBWorker.addItem(context, task);
+                AlarmManagerNot.createOrUpdateNotification(context, task);
             }
         } catch (Exception e) {
             throw new IOException("Ошибка при импорте базы данных", e);

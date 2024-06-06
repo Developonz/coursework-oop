@@ -14,12 +14,14 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.planner.R;
+import com.example.planner.controllers.DBWorker;
 import com.example.planner.controllers.TasksController;
 import com.example.planner.databinding.ActivityMainBinding;
 import com.example.planner.models.Task;
 import com.example.planner.models.TasksViewModel;
 import com.example.planner.utils.DatabaseImporterExporter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -31,7 +33,9 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.navigation.NavigationView;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -46,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_EXPORT = 2;
     private static final int REQUEST_CODE_WRITE_PERMISSION = 3;
 
-    DatabaseImporterExporter taskDatabaseManager = new DatabaseImporterExporter(this);
+    DatabaseImporterExporter taskDatabaseManager;
 
 
     @Override
@@ -70,12 +74,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         controller = new TasksController(this, new ViewModelProvider(this).get(TasksViewModel.class));
+        taskDatabaseManager = new DatabaseImporterExporter(controller);
 
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.export_json) {
+                closeDrawer();
                 if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(this,
@@ -84,9 +90,25 @@ public class MainActivity extends AppCompatActivity {
                 }
                 taskDatabaseManager.openFilePickerForExport(this, REQUEST_CODE_EXPORT);
                 return true;
-            } else  if (id == R.id.import_json) {
+            } else if (id == R.id.import_json) {
                 closeDrawer();
                 getImportMode(this);
+                return true;
+            } else if (id == R.id.reset_data) {
+                closeDrawer();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Сброс");
+                builder.setMessage("Вы точно хотите удалить все ваши данные???");
+                builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        controller.resetData();
+                        controller.loadTasks();
+                    }
+                });
+                builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {}
+                });
+                builder.create().show();
                 return true;
             }
             return false;

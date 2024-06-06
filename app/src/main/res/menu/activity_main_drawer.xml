@@ -13,6 +13,12 @@
                 android:id="@+id/export_json"
                 android:icon="@drawable/upload"
                 android:title="Экспортировать" />
+
+            <item
+                android:id="@+id/reset_data"
+                android:icon="@drawable/baseline_delete_forever_24"
+                android:iconTint="@color/red"
+                android:title="Сбросить данные" />
         </menu>
     </item>
 </menu>

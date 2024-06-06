@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.example.planner.R;
 import com.example.planner.controllers.DBWorker;
+import com.example.planner.controllers.TasksController;
 import com.example.planner.databinding.TaskMenuInfoBinding;
 import com.example.planner.models.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -242,9 +243,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
         taskToUpdate.setPriority(binding.priorityNewTask.getText().toString());
         taskToUpdate.setTaskDate(selectedDate);
         taskToUpdate.setTaskTime(selectedTime);
-        DBWorker.updateItem(context, taskToUpdate);
-
-        adapter.updateTasksList();
+        adapter.updateTask(taskToUpdate);
         dismiss();
     }
 

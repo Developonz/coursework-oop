@@ -4,6 +4,9 @@ import android.content.Context;
 import com.example.planner.R;
 import com.example.planner.models.Task;
 import com.example.planner.models.TasksViewModel;
+import com.example.planner.utils.AlarmManagerNot;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -26,7 +29,7 @@ public class TasksController {
             }
             getTasks().add(task);
         }
-        /*viewModel.getList().setValue(viewModel.getList().getValue());*/
+        AlarmManagerNot.createOrUpdateNotification(context, task);
     }
 
     public void removeTask(Task task) {
@@ -36,16 +39,23 @@ public class TasksController {
             } else {
                 DBWorker.removeItem(context, task);
             }
-            getTasks().remove(task);;
+            getTasks().remove(task);
         }
-        /*viewModel.getList().setValue(viewModel.getList().getValue());*/
+        AlarmManagerNot.deleteNotification(context, task);
+    }
+
+    public void resetData() {
+        for (Task task : viewModel.getListValue()) {
+                AlarmManagerNot.deleteNotification(context, task);
+        }
+        DBWorker.resetDataBase(context);
     }
 
     public void updateTask(Task task) {
         if (getTasks() != null) {
             DBWorker.updateItem(context, task);
         }
-        /*viewModel.getList().setValue(viewModel.getList().getValue());*/
+        AlarmManagerNot.createOrUpdateNotification(context, task);
     }
 
     public void loadTasks() {
