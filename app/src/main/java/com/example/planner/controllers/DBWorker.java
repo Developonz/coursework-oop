@@ -1,12 +1,9 @@
 package com.example.planner.controllers;
 
-import android.app.AlarmManager;
 import android.content.Context;
 import com.example.planner.db.TaskCRUD;
 import com.example.planner.models.Task;
-import com.example.planner.utils.AlarmManagerNot;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

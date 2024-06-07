@@ -20,11 +20,9 @@ import com.example.planner.databinding.HeaderTasksListBinding;
 import com.example.planner.listeners.OnItemHeaderOldRecyclerViewClickListener;
 import com.example.planner.listeners.OnItemTaskRecyclerClickListener;
 import com.example.planner.models.Task;
-import com.example.planner.models.TasksViewModel;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnItemHeaderOldRecyclerViewClickListener, Filterable {
@@ -35,9 +33,9 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private static final int VIEW_TYPE_HEADER_OLD = 1;
     private static final int VIEW_TYPE_TASK = 2;
     private boolean isVisibleOldTasks = true;
-    private OnItemTaskRecyclerClickListener listener;
+    private final OnItemTaskRecyclerClickListener listener;
     private Context context;
-    private TasksController controller;
+    private final TasksController controller;
     private int numberSort = 0;
 
     public TasksRecyclerViewAdapter(String category, OnItemTaskRecyclerClickListener listener, TasksController controller) {

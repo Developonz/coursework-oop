@@ -17,9 +17,9 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 
 public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
-    private TasksRecyclerViewAdapter adapter;
-    private RecyclerView recyclerView;
-    private Context context;
+    private final TasksRecyclerViewAdapter adapter;
+    private final RecyclerView recyclerView;
+    private final Context context;
 
     public TaskItemTouchHelper(TasksRecyclerViewAdapter adapter, RecyclerView recyclerView, Context context) {
         super(0, ItemTouchHelper.LEFT);

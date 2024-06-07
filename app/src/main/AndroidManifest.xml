@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.planner">
 
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -32,7 +31,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".utils.NotificationPublisher"></receiver>
+        <receiver android:name=".utils.Notifications.NotificationPublisher"></receiver>
 
         <provider
             android:name="androidx.core.content.FileProvider"

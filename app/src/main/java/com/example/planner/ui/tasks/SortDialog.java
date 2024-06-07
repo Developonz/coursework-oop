@@ -7,7 +7,7 @@ import android.widget.Toast;
 
 public class SortDialog {
 
-    private Context context;
+    private final Context context;
     private int selectedSortType = 0;
 
     public SortDialog(Context context) {

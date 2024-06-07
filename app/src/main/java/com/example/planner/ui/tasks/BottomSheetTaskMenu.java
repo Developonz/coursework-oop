@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
@@ -20,8 +19,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.example.planner.R;
-import com.example.planner.controllers.DBWorker;
-import com.example.planner.controllers.TasksController;
 import com.example.planner.databinding.TaskMenuInfoBinding;
 import com.example.planner.models.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -45,14 +42,14 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
     private TaskMenuInfoBinding binding;
     private LocalDate selectedDate;
     private LocalTime selectedTime;
-    private TasksRecyclerViewAdapter adapter;
+    private final TasksRecyclerViewAdapter adapter;
     private boolean isUpdateMode = false;
     private boolean isOpenDate = false;
     private boolean isOpenTime = false;
     private Task taskToUpdate;
     private String selectedCategory;
     private String selectedPriority;
-    private Context context;
+    private final Context context;
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 

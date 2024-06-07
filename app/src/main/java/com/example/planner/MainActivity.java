@@ -8,17 +8,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.planner.R;
-import com.example.planner.controllers.DBWorker;
 import com.example.planner.controllers.TasksController;
 import com.example.planner.databinding.ActivityMainBinding;
-import com.example.planner.models.Task;
-import com.example.planner.models.TasksViewModel;
+import com.example.planner.ui.tasks.TasksViewModel;
 import com.example.planner.utils.DatabaseImporterExporter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -26,7 +22,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -36,9 +31,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {

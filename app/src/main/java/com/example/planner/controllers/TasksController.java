@@ -1,14 +1,22 @@
 package com.example.planner.controllers;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
+
+import androidx.core.app.NotificationCompat;
+
 import com.example.planner.R;
 import com.example.planner.models.Task;
-import com.example.planner.models.TasksViewModel;
-import com.example.planner.utils.AlarmManagerNot;
+import com.example.planner.ui.tasks.TasksViewModel;
+import com.example.planner.utils.Notifications.AlarmManagerNot;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Comparator;
 
 public class TasksController {

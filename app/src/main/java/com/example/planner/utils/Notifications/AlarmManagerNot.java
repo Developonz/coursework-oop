@@ -1,10 +1,17 @@
-package com.example.planner.utils;
+package com.example.planner.utils.Notifications;
 
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+
+import androidx.core.app.NotificationCompat;
+
 import com.example.planner.models.Task;
+
 import java.util.Calendar;
 
 public class AlarmManagerNot {
@@ -24,16 +31,18 @@ public class AlarmManagerNot {
         }
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, NotificationPublisher.class);
+        intent.setAction("taskNot " + task.getId());
         intent.putExtra("title", task.getTitle());
-        intent.putExtra("id", task.getId());
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) task.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(android.app.AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 
     public static void deleteNotification(Context context, Task task) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, NotificationPublisher.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) task.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        intent.setAction("taskNot " + task.getId());
+        intent.putExtra("title", task.getTitle());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
     }
 }

@@ -1,41 +1,29 @@
 package com.example.planner.utils;
 
-import static androidx.core.content.ContextCompat.getSystemService;
-
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.example.planner.controllers.DBWorker;
 import com.example.planner.controllers.TasksController;
 import com.example.planner.models.Task;
+import com.example.planner.utils.Notifications.AlarmManagerNot;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseImporterExporter {
 
-    private Context context;
-    private TasksController controller;
+    private final Context context;
+    private final TasksController controller;
 
     public DatabaseImporterExporter(TasksController controller) {
         this.controller = controller;

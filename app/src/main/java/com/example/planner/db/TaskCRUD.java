@@ -17,7 +17,7 @@ public class TaskCRUD {
 
     private SQLiteDatabase db;
 
-    private TaskDbHelper dbHelper;
+    private final TaskDbHelper dbHelper;
 
     public TaskCRUD(Context context) {
         dbHelper = new TaskDbHelper(context);
