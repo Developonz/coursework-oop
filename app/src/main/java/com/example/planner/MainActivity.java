@@ -18,6 +18,7 @@ import com.example.planner.ui.tasks.TasksViewModel;
 import com.example.planner.utils.DatabaseImporterExporter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_IMPORT = 1;
     private static final int REQUEST_CODE_EXPORT = 2;
     private static final int REQUEST_CODE_WRITE_PERMISSION = 3;
+    private static final int REQUEST_CODE_READ_PERMISSION = 4;
 
     DatabaseImporterExporter taskDatabaseManager;
 
@@ -75,17 +77,20 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.export_json) {
                 closeDrawer();
-                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_CODE_WRITE_PERMISSION);
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_PERMISSION);
+                } else {
+                    taskDatabaseManager.openFilePickerForExport(this, REQUEST_CODE_EXPORT);
                 }
-                taskDatabaseManager.openFilePickerForExport(this, REQUEST_CODE_EXPORT);
+
                 return true;
             } else if (id == R.id.import_json) {
                 closeDrawer();
-                getImportMode(this);
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_READ_PERMISSION);
+                } else {
+                    getImportMode(this);
+                }
                 return true;
             } else if (id == R.id.reset_data) {
                 closeDrawer();
@@ -167,4 +172,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_WRITE_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                taskDatabaseManager.openFilePickerForExport(this, REQUEST_CODE_EXPORT);
+            }
+        } else if (requestCode == REQUEST_CODE_READ_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getImportMode(this);
+            }
+        }
+    }
 }
