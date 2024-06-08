@@ -219,12 +219,6 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
         });
     }
 
-    /*private void updateDropDownLists() {
-        Log.i("test", "updateDropDown");
-        setupDropDown(binding.categoryNewTask, R.array.categories, selectedCategory);
-        setupDropDown(binding.priorityNewTask, R.array.priorities, selectedPriority);
-    }*/
-
     private void createTask() {
         String title = binding.titleNewTask.getText().toString();
         String category = binding.categoryNewTask.getText().toString();
@@ -249,8 +243,8 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
             MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
                     .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
                     .setTimeFormat(TimeFormat.CLOCK_24H)
-                    .setHour((selectedTime != null) ? selectedTime.getHour() : 12)
-                    .setMinute((selectedTime != null) ? selectedTime.getMinute() : 0)
+                    .setHour((selectedTime != null) ? selectedTime.getHour() : LocalTime.now().getHour())
+                    .setMinute((selectedTime != null) ? selectedTime.getMinute() : LocalTime.now().getMinute())
                     .setTitleText("Установить время")
                     .setTheme(R.style.TimePicker)
                     .build();

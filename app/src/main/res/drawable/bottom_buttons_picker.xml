@@ -5,8 +5,8 @@
     tools:targetApi="lollipop">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/teal_200" />
-            <corners android:radius="10dp"/>
+            <solid android:color="#B3F7FF" />
+            <corners android:topLeftRadius="10dp" android:bottomLeftRadius="10dp"/>
         </shape>
     </item>
 </ripple>

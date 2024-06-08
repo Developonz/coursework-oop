@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/task_item_container"
+    android:clickable="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="10dp"
-    android:paddingVertical="5dp"
-    android:paddingRight="10dp"
-    android:background="@drawable/background_task_menu_items"
+    android:gravity="center_vertical"
+    android:background="@drawable/bottom_buttons_picker"
     android:backgroundTint="#E2FCFF"
     android:orientation="horizontal">
 
@@ -20,6 +20,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
+        android:paddingVertical="5dp"
+        android:paddingHorizontal="10dp"
+        android:background="@drawable/bottom_buttons_picker"
         android:orientation="vertical">
 
         <TextView
