@@ -49,24 +49,22 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
     private Task taskToUpdate;
     private String selectedCategory;
     private String selectedPriority;
-    private final Context context;
+    private final String[] categoriesTitle = {"Без категории", "Личное", "Учёба", "Работа", "Желания"};
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 
-    private BottomSheetTaskMenu(Context context, TasksRecyclerViewAdapter adapter, String category) {
+    private BottomSheetTaskMenu(Context context, TasksRecyclerViewAdapter adapter, int category) {
         this.adapter = adapter;
         selectedDate = LocalDate.now();
-        selectedCategory = category;
-        this.context = context;
+        selectedCategory = categoriesTitle[category];
     }
 
     private BottomSheetTaskMenu(Context context, TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
         this.adapter = adapter;
         this.taskToUpdate = taskToUpdate;
         this.isUpdateMode = true;
-        selectedDate = taskToUpdate.getTaskDate();
+        selectedDate = taskToUpdate.getTaskDateBegin();
         selectedTime = taskToUpdate.getTaskTime();
-        this.context = context;
     }
 
 
@@ -104,7 +102,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
         isOpenedThis = false;
     }
 
-    public static BottomSheetTaskMenu getInstance(Context context, TasksRecyclerViewAdapter adapter, String category) {
+    public static BottomSheetTaskMenu getInstance(Context context, TasksRecyclerViewAdapter adapter, int category) {
         if (!isOpenedThis) {
             isOpenedThis = true;
             return new BottomSheetTaskMenu(context, adapter, category);
@@ -232,7 +230,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
         taskToUpdate.setTitle(binding.titleNewTask.getText().toString());
         taskToUpdate.setCategory(binding.categoryNewTask.getText().toString());
         taskToUpdate.setPriority(binding.priorityNewTask.getText().toString());
-        taskToUpdate.setTaskDate(selectedDate);
+        taskToUpdate.setTaskDateBegin(selectedDate);
         taskToUpdate.setTaskTime(selectedTime);
         adapter.updateTask(taskToUpdate);
         dismiss();

@@ -9,10 +9,11 @@ public class TaskDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "task.db";
     private static final int DATABASE_VERSION = 1;
 
-    public static final String TABLE_TASK = "task";
+    public static final String TABLE_TASK = "tasks";
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_TITLE = "title";
-    public static final String COLUMN_TASK_DATE = "taskDate";
+    public static final String COLUMN_TASK_DATE_BEGIN = "taskDateBegin";
+    public static final String COLUMN_TASK_DATE_END = "taskDateEnd";
     public static final String COLUMN_TASK_TIME = "taskTime";
     public static final String COLUMN_PRIORITY = "priority";
     public static final String COLUMN_CATEGORY = "category";
@@ -22,7 +23,8 @@ public class TaskDbHelper extends SQLiteOpenHelper {
             + TABLE_TASK + "("
             + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_TITLE + " text not null, "
-            + COLUMN_TASK_DATE + " text, "
+            + COLUMN_TASK_DATE_BEGIN + " text, "
+            + COLUMN_TASK_DATE_END + " text, "
             + COLUMN_TASK_TIME + " text, "
             + COLUMN_PRIORITY + " text, "
             + COLUMN_CATEGORY + " text, "

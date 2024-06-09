@@ -2,8 +2,8 @@ package com.example.planner.ui.tasks;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -11,42 +11,57 @@ import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.planner.controllers.TasksController;
 import com.example.planner.databinding.FragmentTasksItemBinding;
+import com.example.planner.databinding.FragmentTasksItemCompleteBinding;
 import com.example.planner.databinding.HeaderOldTasksListBinding;
 import com.example.planner.databinding.HeaderTasksListBinding;
+import com.example.planner.databinding.LinkToCompleteTasksBinding;
 import com.example.planner.listeners.OnItemHeaderOldRecyclerViewClickListener;
+import com.example.planner.listeners.OnItemLinkRecyclerClickListener;
 import com.example.planner.listeners.OnItemTaskRecyclerClickListener;
 import com.example.planner.models.Task;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnItemHeaderOldRecyclerViewClickListener, Filterable {
     private final List<Object> items;
     private final List<Task> filteredList;
-    private String category;
+    private int category = 0;
+    private boolean isStatusTasks;
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_HEADER_OLD = 1;
     private static final int VIEW_TYPE_TASK = 2;
+    private static final int VIEW_TYPE_LINK = 3;
     private boolean isVisibleOldTasks = true;
-    private final OnItemTaskRecyclerClickListener listener;
-    private Context context;
+    private OnItemTaskRecyclerClickListener listener;
+    private OnItemLinkRecyclerClickListener linkListener;
     private final TasksController controller;
     private int numberSort = 0;
+    private final String[] categoriesTitle = {"Все", "Личное", "Учёба", "Работа", "Желания"};
 
-    public TasksRecyclerViewAdapter(String category, OnItemTaskRecyclerClickListener listener, TasksController controller) {
+    public TasksRecyclerViewAdapter(TasksController controller, boolean isStatusTasks) {
+        this.isStatusTasks = isStatusTasks;
         this.controller = controller;
-        this.context = context;
         items = new ArrayList<>();
         filteredList = new ArrayList<>();
         filteredList.addAll(controller.getTasks());
-        this.category = category;
+        updateTasksList();
+    }
+
+    public TasksRecyclerViewAdapter(OnItemTaskRecyclerClickListener listener, OnItemLinkRecyclerClickListener linkListener, TasksController controller, boolean isStatusTasks) {
+        this.isStatusTasks = isStatusTasks;
+        this.controller = controller;
+        items = new ArrayList<>();
+        filteredList = new ArrayList<>();
+        filteredList.addAll(controller.getTasks());
         this.listener = listener;
+        this.linkListener = linkListener;
         updateTasksList();
     }
 
@@ -56,8 +71,10 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
             return VIEW_TYPE_TASK;
         } else if (items.get(position) == "") {
             return VIEW_TYPE_HEADER;
-        } else {
+        } else if (items.get(position) == "Old") {
             return VIEW_TYPE_HEADER_OLD;
+        } else {
+            return VIEW_TYPE_LINK;
         }
     }
 
@@ -68,21 +85,31 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         if (viewType == VIEW_TYPE_HEADER) {
             return new HeaderHolder(HeaderTasksListBinding.inflate(inflater, parent, false));
         } else if (viewType == VIEW_TYPE_TASK) {
-            return new TaskHolder(FragmentTasksItemBinding.inflate(inflater, parent, false), listener);
-        } else {
+            if (!isStatusTasks) {
+                return new TaskHolder(FragmentTasksItemBinding.inflate(inflater, parent, false), listener);
+            } else {
+                return new CompleteTaskHolder(FragmentTasksItemCompleteBinding.inflate(inflater, parent, false));
+            }
+        } else if (viewType == VIEW_TYPE_HEADER_OLD) {
             return new HeaderOldHolder(HeaderOldTasksListBinding.inflate(inflater, parent, false), this);
+        } else {
+            return new LinkHolder(LinkToCompleteTasksBinding.inflate(inflater, parent, false), linkListener);
         }
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderHolder) {
-            ((HeaderHolder) holder).header.setText(((Task)items.get(position + 1)).getStringDate());
-        } else if (holder instanceof  TaskHolder) {
+            ((HeaderHolder) holder).header.setText(((Task) items.get(position + 1)).getStringDate());
+        } else if (holder instanceof TaskHolder) {
             Task task = (Task) items.get(position);
             ((TaskHolder) holder).mCheck.setChecked(false);
             ((TaskHolder) holder).mContentView.setText(task.getTitle());
             ((TaskHolder) holder).mPriorityView.setText(task.getPriority());
+        } else if (holder instanceof CompleteTaskHolder) {
+            Task task = (Task) items.get(position);
+            ((CompleteTaskHolder) holder).mContentView.setText(task.getTitle());
+            ((CompleteTaskHolder) holder).mPriorityView.setText(task.getPriority());
         }
     }
 
@@ -94,37 +121,58 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public void updateTasksList() {
         items.clear();
         if (filteredList.isEmpty()) {
+            if (linkListener != null) {
+                items.add("L");
+            }
             notifyDataSetChanged();
             return;
         }
-
-        sortItems((ArrayList<Task>) filteredList, true);
-        ArrayList<Task> oldTask = new ArrayList<>();
-        String currentHeader = "";
-        for (Task task : filteredList) {
-            if (!task.getTaskDate().isBefore(LocalDate.now())) {
-                if (category.equals("Все") || task.getCategory().equals(category)) {
+        sortItems((ArrayList<Task>) filteredList);
+        if (!isStatusTasks) {
+            filteredList.sort(Comparator.comparing(Task::getTaskDateBegin));
+            ArrayList<Task> oldTask = new ArrayList<>();
+            String currentHeader = "";
+            for (Task task : filteredList) {
+                if (!task.getTaskDateBegin().isBefore(LocalDate.now())) {
+                    if (category == 0 || task.getCategory().equals(categoriesTitle[category])) {
+                        String taskDate = task.getStringDate();
+                        if (!taskDate.equals(currentHeader)) {
+                            currentHeader = taskDate;
+                            items.add("");
+                        }
+                        items.add(task);
+                    }
+                } else {
+                    if ((category == 0 || task.getCategory().equals(categoriesTitle[category]))) {
+                        oldTask.add(task);
+                    }
+                }
+            }
+            if (!oldTask.isEmpty()) {
+                items.add("Old");
+                if (isVisibleOldTasks) {
+                    sortItems(oldTask);
+                    for (Task task : oldTask) {
+                        if (category == 0 || task.getCategory().equals(categoriesTitle[category])) {
+                            items.add(task);
+                        }
+                    }
+                }
+            }
+            if (linkListener != null) {
+                items.add("L");
+            }
+        } else {
+            filteredList.sort(Comparator.comparing(Task::getTaskDateBegin).reversed());
+            String currentHeader = "";
+            for (Task task : filteredList) {
+                if (category == 0 || task.getCategory().equals(categoriesTitle[category])) {
                     String taskDate = task.getStringDate();
                     if (!taskDate.equals(currentHeader)) {
                         currentHeader = taskDate;
                         items.add("");
                     }
                     items.add(task);
-                }
-            } else {
-                if (category.equals("Все") || task.getCategory().equals(category)) {
-                    oldTask.add(task);
-                }
-            }
-        }
-        if (!oldTask.isEmpty()) {
-            items.add("Old");
-            if (isVisibleOldTasks) {
-                sortItems(oldTask, false);
-                for (Task task : oldTask) {
-                    if (category.equals("Все") || task.getCategory().equals(category)) {
-                        items.add(task);
-                    }
                 }
             }
         }
@@ -141,11 +189,12 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         this.numberSort = numberSort;
         updateTasksList();
     }
-    public void sortItems(ArrayList<Task> list, boolean isDate) {
+
+    public void sortItems(ArrayList<Task> list) {
         if (numberSort < 2) {
-            controller.sortTasksTitle(list, numberSort % 2 == 0, isDate);
+            controller.sortTasksTitle(list, numberSort % 2 == 0);
         } else {
-            controller.sortTasksPriority(list, numberSort % 2 == 0, isDate);
+            controller.sortTasksPriority(list, numberSort % 2 == 0);
         }
     }
 
@@ -167,13 +216,13 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
 
-    public void changeCategory(String category) {
+    public void changeCategory(int category) {
         this.category = category;
         updateTasksList();
     }
 
     public Task getTask(int position) {
-        if  (items.get(position) instanceof Task) {
+        if (items.get(position) instanceof Task) {
             return (Task) items.get(position);
         }
         return null;
@@ -200,7 +249,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
                 Log.i("test", "in char null");
             } else {
                 Log.i("test", "in char not null");
-                for (Task task: controller.getTasks()) {
+                for (Task task : controller.getTasks()) {
                     if (task.getTitle().toLowerCase().contains(charSequence.toString().toLowerCase())) {
                         filteredList.add(task);
                     }
@@ -269,6 +318,36 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
                         listener.onItemViewClick(position);
+                    }
+                }
+            });
+        }
+    }
+
+    public static class CompleteTaskHolder extends RecyclerView.ViewHolder {
+        public final TextView mContentView;
+        public final TextView mPriorityView;
+
+
+        public CompleteTaskHolder(FragmentTasksItemCompleteBinding binding) {
+            super(binding.getRoot());
+            mContentView = binding.titleTaskItem;
+            mPriorityView = binding.priorityTaskItem;
+        }
+    }
+
+    public static class LinkHolder extends RecyclerView.ViewHolder {
+        public final TextView mContentView;
+
+        public LinkHolder(LinkToCompleteTasksBinding binding, OnItemLinkRecyclerClickListener listener) {
+            super(binding.getRoot());
+            mContentView = binding.linkToComplete;
+
+            mContentView.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemLinkClickListener();
                     }
                 }
             });

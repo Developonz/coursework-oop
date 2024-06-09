@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         controller.resetData();
-                        controller.loadTasks();
+                        controller.loadTasks(false);
                     }
                 });
                 builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 if (requestCode == REQUEST_CODE_IMPORT) {
                     try {
                         taskDatabaseManager.importDatabaseFromJson(uri, isSaveDataImport);
-                        controller.loadTasks();
+                        controller.loadTasks(false);
                         Toast.makeText(this, "Импорт завершен", Toast.LENGTH_SHORT).show();
                     } catch (IOException e) {
                         e.printStackTrace();

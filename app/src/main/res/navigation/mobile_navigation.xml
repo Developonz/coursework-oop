@@ -8,7 +8,12 @@
     <fragment
         android:id="@+id/tasks"
         android:name="com.example.planner.ui.tasks.TasksFragment"
-        tools:layout="@layout/fragment_tasks" />
+        tools:layout="@layout/fragment_tasks" >
+        <action
+            android:id="@+id/action_fragmentA_to_fragmentB"
+            app:destination="@id/complete_tasks" />
+    </fragment>
+
 
     <fragment
         android:id="@+id/nav_gallery"
@@ -19,4 +24,9 @@
         android:id="@+id/nav_slideshow"
         android:name="com.example.planner.ui.slideshow.SlideshowFragment"
         tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/complete_tasks"
+        android:name="com.example.planner.ui.tasks.CompleteTasksFragment"
+        tools:layout="@layout/fragment_tasks_complete" />
 </navigation>

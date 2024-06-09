@@ -7,7 +7,8 @@ public class Task {
 
     private long id;
     private String title;
-    private LocalDate taskDate;
+    private LocalDate taskDateBegin;
+    private LocalDate taskDateEnd;
     private LocalTime taskTime;
     private String priority;
     private String category;
@@ -16,18 +17,29 @@ public class Task {
 
     private final String[] mounths = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
 
-    public Task(String title, LocalDate taskDate, LocalTime taskTime, String priority, String category) {
+    public Task(String title, LocalDate taskDateBegin, LocalTime taskTime, String priority, String category) {
         this.title = title;
-        this.taskDate = taskDate;
+        this.taskDateBegin = taskDateBegin;
         this.taskTime = taskTime;
         this.priority = priority;
         this.category = category;
         status = false;
     }
 
-    public Task(String title, LocalDate taskDate, LocalTime taskTime, String priority, String category, boolean status, long id) {
+    public Task(String title, LocalDate taskDateBegin, LocalTime taskTime, String priority, String category, boolean status, long id) {
         this.title = title;
-        this.taskDate = taskDate;
+        this.taskDateBegin = taskDateBegin;
+        this.taskTime = taskTime;
+        this.priority = priority;
+        this.category = category;
+        this.status = status;
+        this.id = id;
+    }
+
+    public Task(String title, LocalDate taskDateBegin, LocalDate taskDateEnd, LocalTime taskTime, String priority, String category, boolean status, long id) {
+        this.title = title;
+        this.taskDateBegin = taskDateBegin;
+        this.taskDateEnd = taskDateEnd;
         this.taskTime = taskTime;
         this.priority = priority;
         this.category = category;
@@ -43,12 +55,20 @@ public class Task {
         this.title = title;
     }
 
-    public LocalDate getTaskDate() {
-        return taskDate;
+    public LocalDate getTaskDateBegin() {
+        return taskDateBegin;
     }
 
-    public void setTaskDate(LocalDate taskDate) {
-        this.taskDate = taskDate;
+    public void setTaskDateBegin(LocalDate taskDateBegin) {
+        this.taskDateBegin = taskDateBegin;
+    }
+
+    public LocalDate getTaskDateEnd() {
+        return taskDateEnd;
+    }
+
+    public void setTaskDateEnd(LocalDate taskDateEnd) {
+        this.taskDateEnd = taskDateEnd;
     }
 
     public LocalTime getTaskTime() {
@@ -76,9 +96,10 @@ public class Task {
     }
 
     public String getStringDate() {
-        String str = taskDate.getDayOfMonth() +
+        LocalDate date = (taskDateEnd == null) ? taskDateBegin : taskDateEnd;
+        String str = date.getDayOfMonth() +
                 " " +
-                mounths[taskDate.getMonthValue() - 1];
+                mounths[date.getMonthValue() - 1];
         return str;
     }
 

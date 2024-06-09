@@ -1,13 +1,6 @@
 package com.example.planner.controllers;
 
-import static android.content.Context.NOTIFICATION_SERVICE;
-import static androidx.core.content.ContextCompat.getSystemService;
-
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
-
-import androidx.core.app.NotificationCompat;
 
 import com.example.planner.R;
 import com.example.planner.models.Task;
@@ -16,7 +9,6 @@ import com.example.planner.utils.Notifications.AlarmManagerNot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Comparator;
 
 public class TasksController {
@@ -34,6 +26,7 @@ public class TasksController {
                 DBWorker.addItem(context, task);
             } else {
                 task.setStatus(false);
+                DBWorker.updateItem(context, task);
             }
             getTasks().add(task);
         }
@@ -42,10 +35,10 @@ public class TasksController {
 
     public void removeTask(Task task) {
         if (getTasks() != null) {
-            if (task.isStatus()) {
-                DBWorker.updateItem(context, task);
-            } else {
+            if (!task.isStatus()) {
                 DBWorker.removeItem(context, task);
+            } else {
+                DBWorker.updateItem(context, task);
             }
             getTasks().remove(task);
         }
@@ -53,8 +46,9 @@ public class TasksController {
     }
 
     public void resetData() {
+        loadTasks(false);
         for (Task task : viewModel.getListValue()) {
-                AlarmManagerNot.deleteNotification(context, task);
+            AlarmManagerNot.deleteNotification(context, task);
         }
         DBWorker.resetDataBase(context);
     }
@@ -66,32 +60,26 @@ public class TasksController {
         AlarmManagerNot.createOrUpdateNotification(context, task);
     }
 
-    public void loadTasks() {
+    public void loadTasks(boolean status) {
         getTasks().clear();
-        DBWorker.getAllTasks(context, getTasks(), false);
+        DBWorker.getAllTasks(context, getTasks(), status);
         viewModel.getList().setValue(viewModel.getList().getValue());
     }
 
-    public void sortTasksTitle(ArrayList<Task> list, boolean direction, boolean isDate) {
+    public void sortTasksTitle(ArrayList<Task> list, boolean direction) {
         if (direction) {
             list.sort(Comparator.comparing(Task::getTitle));
         } else {
             list.sort(Comparator.comparing(Task::getTitle).reversed());
         }
-        if (isDate) {
-            list.sort(Comparator.comparing(Task::getTaskDate));
-        }
     }
 
-    public void sortTasksPriority(ArrayList<Task> list, boolean direction, boolean isDate) {
+    public void sortTasksPriority(ArrayList<Task> list, boolean direction) {
         String[] priorities = context.getResources().getStringArray(R.array.priorities);
         if (direction) {
             list.sort(Comparator.comparingInt(item -> priorities.length - Arrays.asList(priorities).indexOf(item.getPriority()) - 1));
         } else {
             list.sort(Comparator.comparingInt(item -> Arrays.asList(priorities).indexOf(item.getPriority())));
-        }
-        if (isDate) {
-            list.sort(Comparator.comparing(Task::getTaskDate));
         }
     }
 

@@ -7,7 +7,6 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
@@ -31,6 +30,7 @@ import com.example.planner.R;
 import com.example.planner.controllers.DBWorker;
 import com.example.planner.controllers.TasksController;
 import com.example.planner.databinding.FragmentTasksBinding;
+import com.example.planner.databinding.FragmentTasksCompleteBinding;
 import com.example.planner.listeners.OnItemLinkRecyclerClickListener;
 import com.example.planner.listeners.OnItemTaskRecyclerClickListener;
 import com.example.planner.models.Task;
@@ -41,9 +41,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 
-public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickListener, OnItemLinkRecyclerClickListener {
+public class CompleteTasksFragment extends Fragment {
     private TasksRecyclerViewAdapter adapter;
-    private FragmentTasksBinding binding;
+    private FragmentTasksCompleteBinding binding;
     private RecyclerView recyclerView;
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -54,9 +54,9 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = FragmentTasksBinding.inflate(this.getLayoutInflater());
+        binding = FragmentTasksCompleteBinding.inflate(this.getLayoutInflater());
         controller = new TasksController(requireActivity(), new ViewModelProvider(requireActivity()).get(TasksViewModel.class));
-        controller.loadTasks(false);
+        controller.loadTasks(true);
         sortDialog = new SortDialog(requireActivity());
 
         setupToolbar();
@@ -69,8 +69,6 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
                 adapter.resetTasksList();
             }
         });
-
-        binding.addTaskBtn.setOnClickListener(v -> openTaskMenu());
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,17 +79,8 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     @Override
     public void onResume() {
         super.onResume();
-        controller.loadTasks(false);
+        controller.loadTasks(true);
     }
-
-
-    private void openTaskMenu() {
-        BottomSheetTaskMenu bottomSheetTaskMenuInfo = BottomSheetTaskMenu.getInstance(requireActivity(), adapter, tabLayout.getSelectedTabPosition());
-        if (bottomSheetTaskMenuInfo != null) {
-            bottomSheetTaskMenuInfo.show(getParentFragmentManager(), "BottomSheetTaskMenu");
-        }
-    }
-
 
     public void setupOptionsMenu() {
         MenuHost menuHost = requireActivity();
@@ -124,6 +113,9 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
                 } else if (id == R.id.action_sort) {
                     sortDialog.showDialog(adapter);
                     return true;
+                } else if (id == android.R.id.home) {
+                    getActivity().onBackPressed();
+                    return true;
                 }
                 return false;
             }
@@ -131,53 +123,10 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
     }
 
-    @Override
-    public void onItemLinkClickListener() {
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
-        navController.navigate(R.id.action_fragmentA_to_fragmentB);
-
-        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
-            @Override
-            public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
-                if (navDestination.getId() == R.id.complete_tasks) {
-                    getActivity().findViewById(R.id.bottom_navigation).setVisibility(View.GONE);
-                    DrawerLayout drawerLayout = requireActivity().findViewById(R.id.drawer_layout);
-                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                } else {
-                    getActivity().findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
-                    DrawerLayout drawerLayout = requireActivity().findViewById(R.id.drawer_layout);
-                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onItemCheckBoxClick(int position) {
-        Task task = adapter.getTask(position);
-        task.setTaskDateEnd(LocalDate.now().isBefore(task.getTaskDateBegin()) ? task.getTaskDateBegin() : LocalDate.now());
-        task.setStatus(true);
-        adapter.removeItem(task);
-        Snackbar.make(recyclerView, "Выполнено", Snackbar.LENGTH_LONG)
-                .setAnchorView(requireActivity().findViewById(R.id.bottom_navigation))
-                .setAction("Отменить", v -> {
-                    adapter.addItem(task);
-                    task.setTaskDateEnd(null);
-                    DBWorker.updateItem(requireActivity(), task);
-                }).show();
-    }
-
-    @Override
-    public void onItemViewClick(int position) {
-        Task task = adapter.getTask(position);
-        BottomSheetTaskMenu bottomSheetTaskMenuInfo = BottomSheetTaskMenu.getInstance(requireActivity(), adapter, task);
-        if (bottomSheetTaskMenuInfo != null)
-            bottomSheetTaskMenuInfo.show(getParentFragmentManager(), bottomSheetTaskMenuInfo.getTag());
-    }
-
     private void setupToolbar() {
         toolbar = binding.toolbar;
         ((MainActivity) requireActivity()).setSupportActionBar(toolbar);
+        ((MainActivity) requireActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void setupCategories() {
@@ -206,11 +155,9 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     private void setupRecyclerView() {
         recyclerView = binding.list;
         recyclerView.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
-        adapter = new TasksRecyclerViewAdapter(this, this, controller, false);
+        adapter = new TasksRecyclerViewAdapter(controller, true);
         recyclerView.setAdapter(adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TaskItemTouchHelper(adapter, recyclerView, getActivity()));
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
-
-
 }

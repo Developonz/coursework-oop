@@ -10,8 +10,8 @@
         android:icon="@drawable/task_list" />
     <item
         android:id="@+id/nav_gallery"
-        android:title="Календарь"
-        android:icon="@drawable/calendar" />
+        android:title="Заметки"
+        android:icon="@drawable/baseline_edit_note_24" />
     <item
         android:id="@+id/nav_slideshow"
         android:title="Профиль"
