@@ -4,11 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 
-import androidx.documentfile.provider.DocumentFile;
-
-import com.example.planner.controllers.DBWorker;
+import com.example.planner.controllers.TaskDBWorker;
 import com.example.planner.controllers.TasksController;
 import com.example.planner.models.Task;
 import com.example.planner.utils.Notifications.AlarmManagerNot;
@@ -16,17 +13,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,8 +43,8 @@ public class DatabaseImporterExporter {
 
     public void exportDatabaseToJson(Uri uri) throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
-        DBWorker.getAllTasks(context, tasks, false);
-        DBWorker.getAllTasks(context, tasks, true);
+        TaskDBWorker.getAllTasks(context, tasks, false);
+        TaskDBWorker.getAllTasks(context, tasks, true);
         Gson gson = new GsonBuilder().create();
         String json = gson.toJson(tasks);
 
@@ -88,7 +81,7 @@ public class DatabaseImporterExporter {
             }
 
             for (Task task : importedTasks) {
-                DBWorker.addItem(context, task);
+                TaskDBWorker.addItem(context, task);
                 AlarmManagerNot.createOrUpdateNotification(context, task);
             }
         } catch (Exception e) {

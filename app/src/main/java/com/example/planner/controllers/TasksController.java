@@ -23,10 +23,10 @@ public class TasksController {
     public void addTask(Task task) {
         if (getTasks() != null) {
             if (!task.isStatus()) {
-                DBWorker.addItem(context, task);
+                TaskDBWorker.addItem(context, task);
             } else {
                 task.setStatus(false);
-                DBWorker.updateItem(context, task);
+                TaskDBWorker.updateItem(context, task);
             }
             getTasks().add(task);
         }
@@ -36,9 +36,9 @@ public class TasksController {
     public void removeTask(Task task) {
         if (getTasks() != null) {
             if (!task.isStatus()) {
-                DBWorker.removeItem(context, task);
+                TaskDBWorker.removeItem(context, task);
             } else {
-                DBWorker.updateItem(context, task);
+                TaskDBWorker.updateItem(context, task);
             }
             getTasks().remove(task);
         }
@@ -50,19 +50,19 @@ public class TasksController {
         for (Task task : viewModel.getListValue()) {
             AlarmManagerNot.deleteNotification(context, task);
         }
-        DBWorker.resetDataBase(context);
+        TaskDBWorker.resetDataBase(context);
     }
 
     public void updateTask(Task task) {
         if (getTasks() != null) {
-            DBWorker.updateItem(context, task);
+            TaskDBWorker.updateItem(context, task);
         }
         AlarmManagerNot.createOrUpdateNotification(context, task);
     }
 
     public void loadTasks(boolean status) {
         getTasks().clear();
-        DBWorker.getAllTasks(context, getTasks(), status);
+        TaskDBWorker.getAllTasks(context, getTasks(), status);
         viewModel.getList().setValue(viewModel.getList().getValue());
     }
 

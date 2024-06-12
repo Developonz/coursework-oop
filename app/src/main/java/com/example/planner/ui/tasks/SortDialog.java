@@ -14,7 +14,7 @@ public class SortDialog {
         this.context = context;
     }
 
-    public void showDialog(TasksRecyclerViewAdapter adapter) {
+    public void showDialog(TasksTaskRecyclerViewAdapter adapter) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Задачи отсортированы по");
 

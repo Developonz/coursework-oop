@@ -4,9 +4,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
-import com.example.planner.controllers.DBWorker;
+import com.example.planner.controllers.TaskDBWorker;
 import com.example.planner.models.Task;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ public class BootService extends Service {
 
     private void resetAlarms(Context context) {
         ArrayList<Task> alarms = new ArrayList<>();
-        DBWorker.getAllTasks(context, alarms, false);
+        TaskDBWorker.getAllTasks(context, alarms, false);
         for (Task task : alarms) {
             AlarmManagerNot.createOrUpdateNotification(context, task);
         }

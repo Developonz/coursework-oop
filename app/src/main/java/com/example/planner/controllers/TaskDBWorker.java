@@ -7,7 +7,7 @@ import com.example.planner.models.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBWorker {
+public class TaskDBWorker {
 
     public static void addItem(Context context, Task task) {
             TaskCRUD taskCRUD = new TaskCRUD(context);

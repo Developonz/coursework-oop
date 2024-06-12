@@ -42,7 +42,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
     private TaskMenuInfoBinding binding;
     private LocalDate selectedDate;
     private LocalTime selectedTime;
-    private final TasksRecyclerViewAdapter adapter;
+    private final TasksTaskRecyclerViewAdapter adapter;
     private boolean isUpdateMode = false;
     private boolean isOpenDate = false;
     private boolean isOpenTime = false;
@@ -53,13 +53,13 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 
-    private BottomSheetTaskMenu(Context context, TasksRecyclerViewAdapter adapter, int category) {
+    private BottomSheetTaskMenu(Context context, TasksTaskRecyclerViewAdapter adapter, int category) {
         this.adapter = adapter;
         selectedDate = LocalDate.now();
         selectedCategory = categoriesTitle[category];
     }
 
-    private BottomSheetTaskMenu(Context context, TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
+    private BottomSheetTaskMenu(Context context, TasksTaskRecyclerViewAdapter adapter, Task taskToUpdate) {
         this.adapter = adapter;
         this.taskToUpdate = taskToUpdate;
         this.isUpdateMode = true;
@@ -102,7 +102,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
         isOpenedThis = false;
     }
 
-    public static BottomSheetTaskMenu getInstance(Context context, TasksRecyclerViewAdapter adapter, int category) {
+    public static BottomSheetTaskMenu getInstance(Context context, TasksTaskRecyclerViewAdapter adapter, int category) {
         if (!isOpenedThis) {
             isOpenedThis = true;
             return new BottomSheetTaskMenu(context, adapter, category);
@@ -111,7 +111,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
         }
     }
 
-    public static BottomSheetTaskMenu getInstance(Context context, TasksRecyclerViewAdapter adapter, Task taskToUpdate) {
+    public static BottomSheetTaskMenu getInstance(Context context, TasksTaskRecyclerViewAdapter adapter, Task taskToUpdate) {
         if (!isOpenedThis) {
             isOpenedThis = true;
             return new BottomSheetTaskMenu(context, adapter, taskToUpdate);

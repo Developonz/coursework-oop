@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
+    id("androidx.navigation.safeargs")
 }
 
 android {
@@ -12,7 +13,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -45,6 +45,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation ("it.xabaras.android:recyclerview-swipedecorator:1.4")
-    implementation ("com.google.code.gson:gson:2.8.6")
+    implementation("it.xabaras.android:recyclerview-swipedecorator:1.4")
+    implementation("com.google.code.gson:gson:2.10.1")
 }

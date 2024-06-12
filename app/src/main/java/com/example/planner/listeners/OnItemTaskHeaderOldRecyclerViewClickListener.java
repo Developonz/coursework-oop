@@ -1,5 +1,5 @@
 package com.example.planner.listeners;
 
-public interface OnItemHeaderOldRecyclerViewClickListener {
+public interface OnItemTaskHeaderOldRecyclerViewClickListener {
     void onItemHeaderOldClickListener();
 }

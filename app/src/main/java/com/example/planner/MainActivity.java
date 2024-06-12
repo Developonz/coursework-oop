@@ -12,8 +12,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.planner.controllers.NotesController;
 import com.example.planner.controllers.TasksController;
 import com.example.planner.databinding.ActivityMainBinding;
+import com.example.planner.ui.notes.NotesViewModel;
 import com.example.planner.ui.tasks.TasksViewModel;
 import com.example.planner.utils.DatabaseImporterExporter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -25,6 +27,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -37,7 +40,8 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
-    private TasksController controller;
+    private TasksController tasksController;
+    private NotesController notesController;
     private boolean isSaveDataImport = true;
 
     private static final int REQUEST_CODE_IMPORT = 1;
@@ -68,8 +72,9 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        controller = new TasksController(this, new ViewModelProvider(this).get(TasksViewModel.class));
-        taskDatabaseManager = new DatabaseImporterExporter(controller);
+        tasksController = new TasksController(this, new ViewModelProvider(this).get(TasksViewModel.class));
+        notesController = new NotesController(this, new ViewModelProvider(this).get(NotesViewModel.class));
+        taskDatabaseManager = new DatabaseImporterExporter(tasksController);
 
 
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -99,8 +104,10 @@ public class MainActivity extends AppCompatActivity {
                 builder.setMessage("Вы точно хотите удалить все ваши данные???");
                 builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        controller.resetData();
-                        controller.loadTasks(false);
+                        tasksController.resetData();
+                        notesController.resetData();
+                        tasksController.loadTasks(false);
+                        notesController.loadNotes();
                     }
                 });
                 builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
@@ -110,6 +117,21 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             return false;
+        });
+
+        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
+            @Override
+            public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
+                if (navDestination.getId() == R.id.complete_tasks || navDestination.getId() == R.id.note_menu) {
+                    findViewById(R.id.bottom_navigation).setVisibility(View.GONE);
+                    DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                } else {
+                    findViewById(R.id.bottom_navigation).setVisibility(View.VISIBLE);
+                    DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                }
+            }
         });
     }
 
@@ -153,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 if (requestCode == REQUEST_CODE_IMPORT) {
                     try {
                         taskDatabaseManager.importDatabaseFromJson(uri, isSaveDataImport);
-                        controller.loadTasks(false);
+                        tasksController.loadTasks(false);
                         Toast.makeText(this, "Импорт завершен", Toast.LENGTH_SHORT).show();
                     } catch (IOException e) {
                         e.printStackTrace();

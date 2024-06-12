@@ -1,5 +1,5 @@
 package com.example.planner.listeners;
 
-public interface OnItemLinkRecyclerClickListener {
+public interface OnItemCompleteTasksLinkRecyclerClickListener {
     void onItemLinkClickListener();
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/note_item_container"
+    android:clickable="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:gravity="center_vertical"
+    android:background="@drawable/ripple_buttons"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/contentPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="15dp"
+        android:background="@drawable/ripple_buttons"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/titleNoteItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            android:ellipsize="end"
+            android:maxLines="1"/>
+    </LinearLayout>
+</LinearLayout>

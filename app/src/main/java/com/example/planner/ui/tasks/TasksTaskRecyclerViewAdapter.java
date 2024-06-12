@@ -17,10 +17,10 @@ import com.example.planner.controllers.TasksController;
 import com.example.planner.databinding.FragmentTasksItemBinding;
 import com.example.planner.databinding.FragmentTasksItemCompleteBinding;
 import com.example.planner.databinding.HeaderOldTasksListBinding;
-import com.example.planner.databinding.HeaderTasksListBinding;
+import com.example.planner.databinding.HeaderListBinding;
 import com.example.planner.databinding.LinkToCompleteTasksBinding;
-import com.example.planner.listeners.OnItemHeaderOldRecyclerViewClickListener;
-import com.example.planner.listeners.OnItemLinkRecyclerClickListener;
+import com.example.planner.listeners.OnItemTaskHeaderOldRecyclerViewClickListener;
+import com.example.planner.listeners.OnItemCompleteTasksLinkRecyclerClickListener;
 import com.example.planner.listeners.OnItemTaskRecyclerClickListener;
 import com.example.planner.models.Task;
 
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnItemHeaderOldRecyclerViewClickListener, Filterable {
+public class TasksTaskRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnItemTaskHeaderOldRecyclerViewClickListener, Filterable {
     private final List<Object> items;
     private final List<Task> filteredList;
     private int category = 0;
@@ -40,12 +40,12 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     private static final int VIEW_TYPE_LINK = 3;
     private boolean isVisibleOldTasks = true;
     private OnItemTaskRecyclerClickListener listener;
-    private OnItemLinkRecyclerClickListener linkListener;
+    private OnItemCompleteTasksLinkRecyclerClickListener linkListener;
     private final TasksController controller;
     private int numberSort = 0;
     private final String[] categoriesTitle = {"Все", "Личное", "Учёба", "Работа", "Желания"};
 
-    public TasksRecyclerViewAdapter(TasksController controller, boolean isStatusTasks) {
+    public TasksTaskRecyclerViewAdapter(TasksController controller, boolean isStatusTasks) {
         this.isStatusTasks = isStatusTasks;
         this.controller = controller;
         items = new ArrayList<>();
@@ -54,7 +54,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         updateTasksList();
     }
 
-    public TasksRecyclerViewAdapter(OnItemTaskRecyclerClickListener listener, OnItemLinkRecyclerClickListener linkListener, TasksController controller, boolean isStatusTasks) {
+    public TasksTaskRecyclerViewAdapter(OnItemTaskRecyclerClickListener listener, OnItemCompleteTasksLinkRecyclerClickListener linkListener, TasksController controller, boolean isStatusTasks) {
         this.isStatusTasks = isStatusTasks;
         this.controller = controller;
         items = new ArrayList<>();
@@ -83,7 +83,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == VIEW_TYPE_HEADER) {
-            return new HeaderHolder(HeaderTasksListBinding.inflate(inflater, parent, false));
+            return new HeaderHolder(HeaderListBinding.inflate(inflater, parent, false));
         } else if (viewType == VIEW_TYPE_TASK) {
             if (!isStatusTasks) {
                 return new TaskHolder(FragmentTasksItemBinding.inflate(inflater, parent, false), listener);
@@ -270,9 +270,9 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public static class HeaderHolder extends RecyclerView.ViewHolder {
         public final TextView header;
 
-        public HeaderHolder(HeaderTasksListBinding binding) {
+        public HeaderHolder(com.example.planner.databinding.HeaderListBinding binding) {
             super(binding.getRoot());
-            header = binding.headerTasks;
+            header = binding.headerList;
         }
     }
 
@@ -281,7 +281,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         public final ImageView arrow;
 
         @SuppressLint("NotifyDataSetChanged")
-        public HeaderOldHolder(HeaderOldTasksListBinding binding, OnItemHeaderOldRecyclerViewClickListener listener) {
+        public HeaderOldHolder(HeaderOldTasksListBinding binding, OnItemTaskHeaderOldRecyclerViewClickListener listener) {
             super(binding.getRoot());
             header = binding.header;
             arrow = binding.arrow;
@@ -339,7 +339,7 @@ public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public static class LinkHolder extends RecyclerView.ViewHolder {
         public final TextView mContentView;
 
-        public LinkHolder(LinkToCompleteTasksBinding binding, OnItemLinkRecyclerClickListener listener) {
+        public LinkHolder(LinkToCompleteTasksBinding binding, OnItemCompleteTasksLinkRecyclerClickListener listener) {
             super(binding.getRoot());
             mContentView = binding.linkToComplete;
 

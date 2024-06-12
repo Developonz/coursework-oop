@@ -26,4 +26,9 @@
         <item name="android:background">@drawable/bottom_sheet</item>
     </style>
 
+    <style name="CustomSpinnerStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColor">#B0B0B0</item>
+        <item name="android:popupBackground">#B0B0B0</item>
+    </style>
+
 </resources>

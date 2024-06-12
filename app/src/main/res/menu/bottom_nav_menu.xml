@@ -8,12 +8,9 @@
         android:id="@+id/tasks"
         android:title="Задачи"
         android:icon="@drawable/task_list" />
+
     <item
-        android:id="@+id/nav_gallery"
+        android:id="@+id/notes"
         android:title="Заметки"
         android:icon="@drawable/baseline_edit_note_24" />
-    <item
-        android:id="@+id/nav_slideshow"
-        android:title="Профиль"
-        android:icon="@drawable/profile" />
 </menu>
