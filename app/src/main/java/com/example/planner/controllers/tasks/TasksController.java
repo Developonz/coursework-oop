@@ -1,11 +1,11 @@
-package com.example.planner.controllers;
+package com.example.planner.controllers.tasks;
 
 import android.content.Context;
 
 import com.example.planner.R;
 import com.example.planner.models.Task;
 import com.example.planner.ui.tasks.TasksViewModel;
-import com.example.planner.utils.Notifications.AlarmManagerNot;
+import com.example.planner.utils.notifications.ManagerAlarm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +30,7 @@ public class TasksController {
             }
             getTasks().add(task);
         }
-        AlarmManagerNot.createOrUpdateNotification(context, task);
+        ManagerAlarm.createOrUpdateNotification(context, task);
     }
 
     public void removeTask(Task task) {
@@ -42,13 +42,13 @@ public class TasksController {
             }
             getTasks().remove(task);
         }
-        AlarmManagerNot.deleteNotification(context, task);
+        ManagerAlarm.deleteNotification(context, task);
     }
 
     public void resetData() {
         loadTasks(false);
         for (Task task : viewModel.getListValue()) {
-            AlarmManagerNot.deleteNotification(context, task);
+            ManagerAlarm.deleteNotification(context, task);
         }
         TaskDBWorker.resetDataBase(context);
     }
@@ -57,7 +57,7 @@ public class TasksController {
         if (getTasks() != null) {
             TaskDBWorker.updateItem(context, task);
         }
-        AlarmManagerNot.createOrUpdateNotification(context, task);
+        ManagerAlarm.createOrUpdateNotification(context, task);
     }
 
     public void loadTasks(boolean status) {

@@ -1,6 +1,5 @@
 package com.example.planner.ui.tasks;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -24,7 +22,6 @@ import com.example.planner.models.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import java.time.LocalDate;
@@ -32,6 +29,7 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,17 +47,17 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
     private Task taskToUpdate;
     private String selectedCategory;
     private String selectedPriority;
-    private final String[] categoriesTitle = {"Без категории", "Личное", "Учёба", "Работа", "Желания"};
+    private final static String[] categoriesTitle = {"Без категории", "Личное", "Учёба", "Работа", "Желания"};
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 
-    private BottomSheetTaskMenu(Context context, TasksTaskRecyclerViewAdapter adapter, int category) {
+    private BottomSheetTaskMenu(TasksTaskRecyclerViewAdapter adapter, int category) {
         this.adapter = adapter;
         selectedDate = LocalDate.now();
         selectedCategory = categoriesTitle[category];
     }
 
-    private BottomSheetTaskMenu(Context context, TasksTaskRecyclerViewAdapter adapter, Task taskToUpdate) {
+    private BottomSheetTaskMenu(TasksTaskRecyclerViewAdapter adapter, Task taskToUpdate) {
         this.adapter = adapter;
         this.taskToUpdate = taskToUpdate;
         this.isUpdateMode = true;
@@ -85,7 +83,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        View bottomSheet = getDialog().findViewById(com.google.android.material.R.id.design_bottom_sheet);
+        View bottomSheet = Objects.requireNonNull(getDialog()).findViewById(com.google.android.material.R.id.design_bottom_sheet);
         BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheetBehavior.setDraggable(false);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
@@ -102,42 +100,34 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
         isOpenedThis = false;
     }
 
-    public static BottomSheetTaskMenu getInstance(Context context, TasksTaskRecyclerViewAdapter adapter, int category) {
+    public static BottomSheetTaskMenu getInstance(TasksTaskRecyclerViewAdapter adapter, int category) {
         if (!isOpenedThis) {
             isOpenedThis = true;
-            return new BottomSheetTaskMenu(context, adapter, category);
+            return new BottomSheetTaskMenu(adapter, category);
         } else {
             return null;
         }
     }
 
-    public static BottomSheetTaskMenu getInstance(Context context, TasksTaskRecyclerViewAdapter adapter, Task taskToUpdate) {
+    public static BottomSheetTaskMenu getInstance(TasksTaskRecyclerViewAdapter adapter, Task taskToUpdate) {
         if (!isOpenedThis) {
             isOpenedThis = true;
-            return new BottomSheetTaskMenu(context, adapter, taskToUpdate);
+            return new BottomSheetTaskMenu(adapter, taskToUpdate);
         } else {
             return null;
         }
     }
 
     private void changeModeKeyBoarding() {
-        binding.getRoot().getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
-            @Override
-            public void onWindowFocusChanged(boolean hasFocus) {
-                if (hasFocus) {
-                    if (getDialog() != null && getDialog().getWindow() != null) {
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-                            }
-                        }, 100);
+        binding.getRoot().getViewTreeObserver().addOnWindowFocusChangeListener(hasFocus -> {
+            if (hasFocus) {
+                if (getDialog() != null && getDialog().getWindow() != null) {
+                    new Handler().postDelayed(() -> getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE), 100);
 
-                    }
-                } else {
-                    if (getDialog() != null && getDialog().getWindow() != null) {
-                        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
-                    }
+                }
+            } else {
+                if (getDialog() != null && getDialog().getWindow() != null) {
+                    getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
                 }
             }
         });
@@ -171,7 +161,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
         }
 
         binding.createTaskBtn.setOnClickListener(v -> {
-            String title = binding.titleNewTask.getText().toString();
+            String title = Objects.requireNonNull(binding.titleNewTask.getText()).toString();
             if (!title.isEmpty()) {
                 if (isUpdateMode) {
                     updateTask();
@@ -180,7 +170,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
                 }
                 resetTime();
             } else {
-                showToast("Название не может быть пустым");
+                showToast();
             }
         });
 
@@ -196,7 +186,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
             String[] categories = getResources().getStringArray(R.array.categories);
             String[] priorities = getResources().getStringArray(R.array.priorities);
 
-            getActivity().runOnUiThread(() -> {
+            requireActivity().runOnUiThread(() -> {
                 setupDropDown(binding.categoryNewTask, categories, selectedCategory);
                 setupDropDown(binding.priorityNewTask, priorities, selectedPriority);
             });
@@ -218,7 +208,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
     }
 
     private void createTask() {
-        String title = binding.titleNewTask.getText().toString();
+        String title = Objects.requireNonNull(binding.titleNewTask.getText()).toString();
         String category = binding.categoryNewTask.getText().toString();
         String priority = binding.priorityNewTask.getText().toString();
         Task task = new Task(title, selectedDate, selectedTime, priority, category);
@@ -227,7 +217,7 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
     }
 
     private void updateTask() {
-        taskToUpdate.setTitle(binding.titleNewTask.getText().toString());
+        taskToUpdate.setTitle(Objects.requireNonNull(binding.titleNewTask.getText()).toString());
         taskToUpdate.setCategory(binding.categoryNewTask.getText().toString());
         taskToUpdate.setPriority(binding.priorityNewTask.getText().toString());
         taskToUpdate.setTaskDateBegin(selectedDate);
@@ -247,20 +237,12 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
                     .setTheme(R.style.TimePicker)
                     .build();
 
-            timePicker.addOnPositiveButtonClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    selectedTime = LocalTime.of(timePicker.getHour(), timePicker.getMinute());
-                    binding.removeTime.setVisibility(View.VISIBLE);
-                    binding.timeTVBS.setText(selectedTime.toString());
-                }
+            timePicker.addOnPositiveButtonClickListener(v -> {
+                selectedTime = LocalTime.of(timePicker.getHour(), timePicker.getMinute());
+                binding.removeTime.setVisibility(View.VISIBLE);
+                binding.timeTVBS.setText(selectedTime.toString());
             });
-            timePicker.addOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    isOpenTime = false;
-                }
-            });
+            timePicker.addOnDismissListener(dialog -> isOpenTime = false);
             isOpenTime = true;
             timePicker.show(getParentFragmentManager(), getTag());
         }
@@ -277,32 +259,25 @@ public class BottomSheetTaskMenu extends BottomSheetDialogFragment {
             builder.setSelection(milliseconds);
             builder.setTheme(R.style.DatePicker);
             MaterialDatePicker<Long> datePicker = builder.build();
-            datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
-                @Override
-                public void onPositiveButtonClick(Long selection) {
-                    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                    calendar.setTimeInMillis(selection);
-                    int year = calendar.get(Calendar.YEAR);
-                    int month = calendar.get(Calendar.MONTH);
-                    int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-                    selectedDate = LocalDate.of(year, month + 1, dayOfMonth);
-                    binding.dateTVBS.setText(selectedDate.toString());
-                }
+            datePicker.addOnPositiveButtonClickListener(selection -> {
+                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                calendar.setTimeInMillis(selection);
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+                selectedDate = LocalDate.of(year, month + 1, dayOfMonth);
+                binding.dateTVBS.setText(selectedDate.toString());
             });
-            datePicker.addOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    isOpenDate = false;
-                }
-            });
+            datePicker.addOnDismissListener(dialog -> isOpenDate = false);
             isOpenDate = true;
             datePicker.show(getParentFragmentManager(), getTag());
         }
     }
 
-    private void showToast(String message) {
-        Toast toast = Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT);
+    private void showToast() {
+        Toast toast = Toast.makeText(requireContext(), "Название не может быть пустым", Toast.LENGTH_SHORT);
         View view = toast.getView();
+        assert view != null;
         view.setBackgroundColor(Color.parseColor("#333333"));
         TextView text = view.findViewById(android.R.id.message);
         text.setTextColor(Color.WHITE);

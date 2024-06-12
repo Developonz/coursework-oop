@@ -1,9 +1,8 @@
-package com.example.planner.controllers;
+package com.example.planner.controllers.notes;
 
 import android.content.Context;
-import com.example.planner.db.NoteCRUD;
+import com.example.planner.db.notes.NoteCRUD;
 import com.example.planner.models.Note;
-
 import java.util.ArrayList;
 import java.util.List;
 

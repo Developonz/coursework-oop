@@ -2,13 +2,14 @@ package com.example.planner.ui.notes;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
+
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
-import com.example.planner.controllers.NotesController;
+import com.example.planner.controllers.notes.NotesController;
 import com.example.planner.databinding.FragmentNotesItemBinding;
 import com.example.planner.databinding.HeaderListBinding;
 import com.example.planner.listeners.OnItemNoteRecyclerClickListener;
@@ -18,14 +19,14 @@ import java.util.Comparator;
 import java.util.List;
 
 public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
-    private final List<Object> items;
-    private final List<Note> filteredList;
-    private int category = 0;
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_NOTE = 1;
-    private OnItemNoteRecyclerClickListener listener;
+    private final static String[] categoriesTitle = {"Все", "Личное", "Учёба", "Работа", "Желания"};
+    private final List<Object> items;
+    private final List<Note> filteredList;
+    private final OnItemNoteRecyclerClickListener listener;
     private final NotesController controller;
-    private final String[] categoriesTitle = {"Все", "Личное", "Учёба", "Работа", "Желания"};
+    private int category = 0;
 
     public NotesRecyclerViewAdapter(NotesController controller, OnItemNoteRecyclerClickListener listener) {
         this.controller = controller;
@@ -58,7 +59,7 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderHolder) {
             ((HeaderHolder) holder).header.setText(((Note) items.get(position + 1)).getStringDate());
         } else if (holder instanceof NoteHolder) {
@@ -72,6 +73,7 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         return items.size();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void updateNotesList() {
         items.clear();
         if (filteredList.isEmpty()) {
@@ -108,11 +110,6 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public void removeItem(Note note) {
         filteredList.remove(note);
         controller.removeNote(note);
-        updateNotesList();
-    }
-
-    public void updateNotes(Note note) {
-        controller.updateNote(note);
         updateNotesList();
     }
     
@@ -160,7 +157,7 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     };
 
 
-    public static class HeaderHolder extends RecyclerView.ViewHolder {
+    private static class HeaderHolder extends RecyclerView.ViewHolder {
         public final TextView header;
 
         public HeaderHolder(HeaderListBinding binding) {
@@ -172,15 +169,13 @@ public class NotesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
     public static class NoteHolder extends RecyclerView.ViewHolder {
         public final TextView mContentView;
 
-
         public NoteHolder(FragmentNotesItemBinding binding, OnItemNoteRecyclerClickListener listener) {
             super(binding.getRoot());
             mContentView = binding.titleNoteItem;
 
-
             binding.contentPanel.setOnClickListener(v -> {
                 if (listener != null) {
-                    int position = getAdapterPosition();
+                    int position = getBindingAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
                         listener.onItemViewClick(position);
                     }

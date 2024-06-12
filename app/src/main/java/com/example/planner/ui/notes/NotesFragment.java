@@ -8,14 +8,12 @@ import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,22 +23,16 @@ import android.view.ViewGroup;
 
 import com.example.planner.MainActivity;
 import com.example.planner.R;
-import com.example.planner.controllers.NotesController;
+import com.example.planner.controllers.notes.NotesController;
 import com.example.planner.databinding.FragmentNotesBinding;
 import com.example.planner.listeners.OnItemNoteRecyclerClickListener;
 import com.example.planner.models.Note;
 import com.google.android.material.tabs.TabLayout;
 
-import java.time.LocalDate;
-import java.util.List;
-
 
 public class NotesFragment extends Fragment implements OnItemNoteRecyclerClickListener {
     private NotesRecyclerViewAdapter adapter;
     private FragmentNotesBinding binding;
-    private RecyclerView recyclerView;
-    private Toolbar toolbar;
-    private TabLayout tabLayout;
     private NotesController controller;
 
 
@@ -54,12 +46,7 @@ public class NotesFragment extends Fragment implements OnItemNoteRecyclerClickLi
         setupCategories();
         setupRecyclerView();
 
-        controller.getViewModel().getList().observe(this, new Observer<List<Note>>() {
-            @Override
-            public void onChanged(List<Note> note) {
-                adapter.resetNotesList();
-            }
-        });
+        controller.getViewModel().getList().observe(this, note -> adapter.resetNotesList());
 
         binding.addNoteBtn.setOnClickListener(v -> openNoteMenu());
     }
@@ -77,7 +64,7 @@ public class NotesFragment extends Fragment implements OnItemNoteRecyclerClickLi
 
 
     private void openNoteMenu() {
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_content);
         navController.navigate(R.id.openNoteMenu);
     }
 
@@ -87,10 +74,10 @@ public class NotesFragment extends Fragment implements OnItemNoteRecyclerClickLi
         menuHost.addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                Log.i("test", "onCreateMenu called");
                 menuInflater.inflate(R.menu.search_menu, menu);
                 MenuItem searchItem = menu.findItem(R.id.action_search);
                 SearchView searchView = (SearchView) searchItem.getActionView();
+                assert searchView != null;
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
@@ -107,10 +94,6 @@ public class NotesFragment extends Fragment implements OnItemNoteRecyclerClickLi
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                if (id == R.id.action_search) {
-                    return true;
-                }
                 return false;
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
@@ -120,17 +103,17 @@ public class NotesFragment extends Fragment implements OnItemNoteRecyclerClickLi
     public void onItemViewClick(int position) {
         Note note = adapter.getNote(position);
         NotesFragmentDirections.OpenNoteMenu action = NotesFragmentDirections.openNoteMenu(note.getId());
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_content);
         navController.navigate(action);
     }
 
     private void setupToolbar() {
-        toolbar = binding.toolbar;
+        Toolbar toolbar = binding.toolbar;
         ((MainActivity) requireActivity()).setSupportActionBar(toolbar);
     }
 
     private void setupCategories() {
-        tabLayout = binding.tabLayout;
+        TabLayout tabLayout = binding.tabLayout;
         final String[] categoriesTitle = {"Все", "Личное", "Учёба", "Работа", "Желания"};
         for (String title : categoriesTitle) {
             TabLayout.Tab tab = tabLayout.newTab().setText(title);
@@ -153,7 +136,7 @@ public class NotesFragment extends Fragment implements OnItemNoteRecyclerClickLi
     }
 
     private void setupRecyclerView() {
-        recyclerView = binding.list;
+        RecyclerView recyclerView = binding.list;
         recyclerView.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
         adapter = new NotesRecyclerViewAdapter(controller, this);
         recyclerView.setAdapter(adapter);

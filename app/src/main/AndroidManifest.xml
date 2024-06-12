@@ -3,8 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.planner">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
@@ -33,11 +36,11 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".utils.Notifications.BootService" android:exported="true" />
+        <service android:name=".utils.notifications.BootService" android:exported="true" />
 
 
-        <receiver android:name=".utils.Notifications.NotificationPublisher" />
-        <receiver android:name=".utils.Notifications.BootReceiver"
+        <receiver android:name=".utils.notifications.PublisherNotification" />
+        <receiver android:name=".utils.notifications.BootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -45,18 +48,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.planner.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
-
     </application>
 
 </manifest>

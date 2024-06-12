@@ -2,22 +2,18 @@ package com.example.planner.ui.tasks;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Typeface;
-import android.util.TypedValue;
+
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.planner.MainActivity;
 import com.example.planner.R;
-import com.example.planner.controllers.TaskDBWorker;
+import com.example.planner.controllers.tasks.TaskDBWorker;
 import com.example.planner.models.Task;
-import com.example.planner.utils.Notifications.AlarmManagerNot;
 import com.google.android.material.snackbar.Snackbar;
-
+import com.example.planner.utils.notifications.ManagerAlarm;
+import com.example.planner.utils.SwipeDecorator;
 import java.time.LocalDate;
-
-import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 
 public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
@@ -49,24 +45,20 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+        final int position = viewHolder.getBindingAdapterPosition();
+        Task task = adapter.getTask(position);
         if (viewHolder instanceof TasksTaskRecyclerViewAdapter.TaskHolder) {
-            final int position = viewHolder.getAdapterPosition();
-            Task task = adapter.getTask(position);
             adapter.removeItem(task);
             Snackbar.make(recyclerView, "Удалено", Snackbar.LENGTH_LONG)
                     .setAnchorView(((MainActivity) context).findViewById(R.id.bottom_navigation))
-                    .setAction("Отменить", v -> {
-                        adapter.addItem(task);
-                    }).show();
+                    .setAction("Отменить", v -> adapter.addItem(task)).show();
         } else {
-            final int position = viewHolder.getAdapterPosition();
-            Task task = adapter.getTask(position);
             LocalDate date = task.getTaskDateEnd();
             task.setTaskDateEnd(null);
             adapter.removeItem(task);
             task.setStatus(false);
             TaskDBWorker.updateItem(context, task);
-            AlarmManagerNot.createOrUpdateNotification(context, task);
+            ManagerAlarm.createOrUpdateNotification(context, task);
             Snackbar.make(recyclerView, "Восстановлено", Snackbar.LENGTH_LONG)
                     .setAnchorView(((MainActivity) context).findViewById(R.id.bottom_navigation))
                     .setAction("Отменить", v -> {
@@ -82,30 +74,11 @@ public class TaskItemTouchHelper extends ItemTouchHelper.SimpleCallback {
     @Override
     public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
         if (viewHolder instanceof TasksTaskRecyclerViewAdapter.TaskHolder) {
-            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                    .addSwipeLeftBackgroundColor(ContextCompat.getColor(viewHolder.itemView.getContext(), R.color.red))
-                    .setSwipeLeftLabelColor(ContextCompat.getColor(viewHolder.itemView.getContext(), R.color.white))
-                    .setSwipeLeftLabelTextSize(TypedValue.COMPLEX_UNIT_SP, 16)
-                    .setSwipeLeftLabelTypeface(Typeface.DEFAULT_BOLD)
-                    .addSwipeLeftLabel("Удалить")
-                    .create()
-                    .decorate();
+            SwipeDecorator.createDecorator(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive, "Удалить", R.color.red);
         } else if (viewHolder instanceof TasksTaskRecyclerViewAdapter.CompleteTaskHolder) {
-            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                    .addSwipeLeftBackgroundColor(ContextCompat.getColor(viewHolder.itemView.getContext(), R.color.blue))
-                    .setSwipeLeftLabelColor(ContextCompat.getColor(viewHolder.itemView.getContext(), R.color.white))
-                    .setSwipeLeftLabelTextSize(TypedValue.COMPLEX_UNIT_SP, 16)
-                    .setSwipeLeftLabelTypeface(Typeface.DEFAULT_BOLD)
-                    .addSwipeLeftLabel("Восстановить")
-                    .create()
-                    .decorate();
+            SwipeDecorator.createDecorator(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive, "Восстановить", R.color.blue);
         }
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-    }
-
-    @Override
-    public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
-        return 0.5f;
     }
 
     @Override

@@ -1,17 +1,14 @@
-package com.example.planner.db;
+package com.example.planner.db.tasks;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
 import com.example.planner.models.Task;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class TaskCRUD {
 
@@ -25,7 +22,6 @@ public class TaskCRUD {
 
     public void open() {
         db = dbHelper.getWritableDatabase();
-        /*dbHelper.onUpgrade(db, 1, 1);*/
     }
 
     public void close() {

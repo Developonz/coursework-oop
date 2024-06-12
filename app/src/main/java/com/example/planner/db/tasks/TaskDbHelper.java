@@ -1,4 +1,4 @@
-package com.example.planner.db;
+package com.example.planner.db.tasks;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

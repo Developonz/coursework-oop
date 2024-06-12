@@ -8,41 +8,35 @@ import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.example.planner.MainActivity;
 import com.example.planner.R;
-import com.example.planner.controllers.TaskDBWorker;
-import com.example.planner.controllers.TasksController;
+import com.example.planner.controllers.tasks.TaskDBWorker;
+import com.example.planner.controllers.tasks.TasksController;
 import com.example.planner.databinding.FragmentTasksBinding;
 import com.example.planner.listeners.OnItemCompleteTasksLinkRecyclerClickListener;
 import com.example.planner.listeners.OnItemTaskRecyclerClickListener;
 import com.example.planner.models.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
-
 import java.time.LocalDate;
-import java.util.List;
 
 
 public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickListener, OnItemCompleteTasksLinkRecyclerClickListener {
     private TasksTaskRecyclerViewAdapter adapter;
     private FragmentTasksBinding binding;
     private RecyclerView recyclerView;
-    private Toolbar toolbar;
     private TabLayout tabLayout;
     private TasksController controller;
     private SortDialog sortDialog;
@@ -59,12 +53,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
         setupCategories();
         setupRecyclerView();
 
-        controller.getViewModel().getList().observe(this, new Observer<List<Task>>() {
-            @Override
-            public void onChanged(List<Task> tasks) {
-                adapter.resetTasksList();
-            }
-        });
+        controller.getViewModel().getList().observe(this, tasks -> adapter.resetTasksList());
 
         binding.addTaskBtn.setOnClickListener(v -> openTaskMenu());
     }
@@ -82,7 +71,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
 
 
     private void openTaskMenu() {
-        BottomSheetTaskMenu bottomSheetTaskMenuInfo = BottomSheetTaskMenu.getInstance(requireActivity(), adapter, tabLayout.getSelectedTabPosition());
+        BottomSheetTaskMenu bottomSheetTaskMenuInfo = BottomSheetTaskMenu.getInstance(adapter, tabLayout.getSelectedTabPosition());
         if (bottomSheetTaskMenuInfo != null) {
             bottomSheetTaskMenuInfo.show(getParentFragmentManager(), "BottomSheetTaskMenu");
         }
@@ -94,10 +83,10 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
         menuHost.addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                Log.i("test", "onCreateMenu called");
                 menuInflater.inflate(R.menu.main, menu);
                 MenuItem searchItem = menu.findItem(R.id.action_search);
                 SearchView searchView = (SearchView) searchItem.getActionView();
+                assert searchView != null;
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
@@ -129,7 +118,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
 
     @Override
     public void onItemLinkClickListener() {
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main);
+        NavController navController = Navigation.findNavController(requireActivity(), R.id.fragment_content);
         navController.navigate(R.id.openCompleteTasks);
     }
 
@@ -151,13 +140,13 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     @Override
     public void onItemViewClick(int position) {
         Task task = adapter.getTask(position);
-        BottomSheetTaskMenu bottomSheetTaskMenuInfo = BottomSheetTaskMenu.getInstance(requireActivity(), adapter, task);
+        BottomSheetTaskMenu bottomSheetTaskMenuInfo = BottomSheetTaskMenu.getInstance(adapter, task);
         if (bottomSheetTaskMenuInfo != null)
             bottomSheetTaskMenuInfo.show(getParentFragmentManager(), bottomSheetTaskMenuInfo.getTag());
     }
 
     private void setupToolbar() {
-        toolbar = binding.toolbar;
+        Toolbar toolbar = binding.toolbar;
         ((MainActivity) requireActivity()).setSupportActionBar(toolbar);
     }
 
@@ -192,6 +181,4 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TaskItemTouchHelper(adapter, recyclerView, getActivity()));
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
-
-
 }

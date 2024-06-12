@@ -8,35 +8,27 @@ import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.example.planner.MainActivity;
 import com.example.planner.R;
-import com.example.planner.controllers.TasksController;
+import com.example.planner.controllers.tasks.TasksController;
 import com.example.planner.databinding.FragmentTasksCompleteBinding;
-import com.example.planner.models.Task;
 import com.google.android.material.tabs.TabLayout;
-
-import java.util.List;
+import java.util.Objects;
 
 
 public class CompleteTasksFragment extends Fragment {
     private TasksTaskRecyclerViewAdapter adapter;
     private FragmentTasksCompleteBinding binding;
-    private RecyclerView recyclerView;
-    private Toolbar toolbar;
-    private TabLayout tabLayout;
     private TasksController controller;
     private SortDialog sortDialog;
 
@@ -53,12 +45,7 @@ public class CompleteTasksFragment extends Fragment {
         setupCategories();
         setupRecyclerView();
 
-        controller.getViewModel().getList().observe(this, new Observer<List<Task>>() {
-            @Override
-            public void onChanged(List<Task> tasks) {
-                adapter.resetTasksList();
-            }
-        });
+        controller.getViewModel().getList().observe(this, tasks -> adapter.resetTasksList());
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -80,6 +67,7 @@ public class CompleteTasksFragment extends Fragment {
                 menuInflater.inflate(R.menu.main, menu);
                 MenuItem searchItem = menu.findItem(R.id.action_search);
                 SearchView searchView = (SearchView) searchItem.getActionView();
+                assert searchView != null;
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
@@ -103,7 +91,7 @@ public class CompleteTasksFragment extends Fragment {
                     sortDialog.showDialog(adapter);
                     return true;
                 } else if (id == android.R.id.home) {
-                    getActivity().onBackPressed();
+                    requireActivity().onBackPressed();
                     return true;
                 }
                 return false;
@@ -113,13 +101,13 @@ public class CompleteTasksFragment extends Fragment {
     }
 
     private void setupToolbar() {
-        toolbar = binding.toolbar;
+        Toolbar toolbar = binding.toolbar;
         ((MainActivity) requireActivity()).setSupportActionBar(toolbar);
-        ((MainActivity) requireActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(((MainActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
     }
 
     private void setupCategories() {
-        tabLayout = binding.tabLayout;
+        TabLayout tabLayout = binding.tabLayout;
         final String[] categoriesTitle = {"Все", "Личное", "Учёба", "Работа", "Желания"};
         for (String title : categoriesTitle) {
             TabLayout.Tab tab = tabLayout.newTab().setText(title);
@@ -142,7 +130,7 @@ public class CompleteTasksFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        recyclerView = binding.list;
+        RecyclerView recyclerView = binding.list;
         recyclerView.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
         adapter = new TasksTaskRecyclerViewAdapter(controller, true);
         recyclerView.setAdapter(adapter);

@@ -1,17 +1,12 @@
 package com.example.planner.ui.notes;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.example.planner.models.Note;
-import com.example.planner.models.Task;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class NotesViewModel extends ViewModel {
-
     private final MutableLiveData<List<Note>> notesList;
 
     public NotesViewModel() {
@@ -22,7 +17,6 @@ public class NotesViewModel extends ViewModel {
     public ArrayList<Note> getListValue() {
         return (ArrayList<Note>) notesList.getValue();
     }
-
     public MutableLiveData<List<Note>> getList() {
         return notesList;
     }

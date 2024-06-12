@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TasksViewModel extends ViewModel {
-
     private final MutableLiveData<List<Task>> tasksList;
 
     public TasksViewModel() {
@@ -20,9 +19,7 @@ public class TasksViewModel extends ViewModel {
     public ArrayList<Task> getListValue() {
         return (ArrayList<Task>) tasksList.getValue();
     }
-
     public MutableLiveData<List<Task>> getList() {
         return tasksList;
     }
-
 }

@@ -1,4 +1,4 @@
-package com.example.planner.utils.Notifications;
+package com.example.planner.utils.notifications;
 
 import android.app.Notification;
 import android.content.BroadcastReceiver;
@@ -7,7 +7,7 @@ import android.content.Intent;
 
 import androidx.core.app.NotificationCompat;
 
-public class NotificationPublisher extends BroadcastReceiver {
+public class PublisherNotification extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         TasksNot notificationHelper = new TasksNot(context);

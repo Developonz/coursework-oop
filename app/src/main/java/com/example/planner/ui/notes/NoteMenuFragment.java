@@ -2,7 +2,6 @@ package com.example.planner.ui.notes;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,7 +13,6 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuHost;
 import androidx.core.view.MenuProvider;
@@ -24,16 +22,16 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.planner.MainActivity;
 import com.example.planner.R;
-import com.example.planner.controllers.NotesController;
+import com.example.planner.controllers.notes.NotesController;
 import com.example.planner.databinding.FragmentNoteMenuBinding;
 import com.example.planner.models.Note;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class NoteMenuFragment extends Fragment {
     private FragmentNoteMenuBinding binding;
     private NotesController controller;
-    private Toolbar toolbar;
     private Note note;
 
 
@@ -96,9 +94,9 @@ public class NoteMenuFragment extends Fragment {
     }
 
     private void setupToolbar() {
-        toolbar = binding.toolbar;
+        Toolbar toolbar = binding.toolbar;
         ((MainActivity) requireActivity()).setSupportActionBar(toolbar);
-        ((MainActivity) requireActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(((MainActivity) requireActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
     }
 
     public void setupOptionsMenu() {
@@ -113,7 +111,7 @@ public class NoteMenuFragment extends Fragment {
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 int id = menuItem.getItemId();
                 if (id == android.R.id.home) {
-                    getActivity().onBackPressed();
+                    requireActivity().onBackPressed();
                     return true;
                 }
                 return false;
@@ -123,9 +121,9 @@ public class NoteMenuFragment extends Fragment {
     }
 
     private void closeKeyboard() {
-        View view = getActivity().getCurrentFocus();
+        View view = requireActivity().getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }

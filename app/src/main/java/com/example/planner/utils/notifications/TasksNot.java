@@ -1,4 +1,4 @@
-package com.example.planner.utils.Notifications;
+package com.example.planner.utils.notifications;
 
 import android.annotation.TargetApi;
 import android.app.NotificationChannel;
@@ -7,8 +7,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
 

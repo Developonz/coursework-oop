@@ -1,12 +1,10 @@
-package com.example.planner.db;
+package com.example.planner.db.notes;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
 import com.example.planner.models.Note;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +21,6 @@ public class NoteCRUD {
 
     public void open() {
         db = dbHelper.getWritableDatabase();
-        /*dbHelper.onUpgrade(db, 1, 1);*/
     }
 
     public void close() {

@@ -1,9 +1,8 @@
-package com.example.planner.controllers;
+package com.example.planner.controllers.tasks;
 
 import android.content.Context;
-import com.example.planner.db.TaskCRUD;
+import com.example.planner.db.tasks.TaskCRUD;
 import com.example.planner.models.Task;
-
 import java.util.ArrayList;
 import java.util.List;
 

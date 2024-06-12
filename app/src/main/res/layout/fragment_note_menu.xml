@@ -35,7 +35,7 @@
                 android:id="@+id/note_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Название заметки"
+                android:hint="@string/titleNoteCreate"
                 android:background="@android:color/transparent"
                 android:textColor="@color/black"
                 android:textColorHint="@color/black"
@@ -63,7 +63,6 @@
                     android:id="@+id/note_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="22.04.2024"
                     android:textColor="@color/black" />
 
 

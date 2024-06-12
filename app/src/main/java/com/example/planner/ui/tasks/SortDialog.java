@@ -2,7 +2,6 @@ package com.example.planner.ui.tasks;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.widget.Toast;
 
 public class SortDialog {
@@ -25,19 +24,12 @@ public class SortDialog {
                 "По приоритету (По убыванию)"
         };
 
-        builder.setSingleChoiceItems(sortTypes, selectedSortType, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                selectedSortType = which;
-            }
-        });
+        builder.setSingleChoiceItems(sortTypes, selectedSortType, (dialog, which) -> selectedSortType = which);
 
         // Кнопка "ВЫБОР"
-        builder.setPositiveButton("ВЫБОР", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                Toast.makeText(context, "Выбран тип сортировки: " + sortTypes[selectedSortType], Toast.LENGTH_SHORT).show();
-                adapter.sortItems(selectedSortType);
-            }
+        builder.setPositiveButton("ВЫБОР", (dialog, id) -> {
+            Toast.makeText(context, "Выбран тип сортировки: " + sortTypes[selectedSortType], Toast.LENGTH_SHORT).show();
+            adapter.sortItems(selectedSortType);
         });
 
 

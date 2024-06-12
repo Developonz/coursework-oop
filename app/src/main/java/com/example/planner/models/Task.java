@@ -15,7 +15,7 @@ public class Task {
 
     private boolean status;
 
-    private final String[] mounths = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
+    private final static String[] mounths = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
 
     public Task(String title, LocalDate taskDateBegin, LocalTime taskTime, String priority, String category) {
         this.title = title;
@@ -97,10 +97,9 @@ public class Task {
 
     public String getStringDate() {
         LocalDate date = (taskDateEnd == null) ? taskDateBegin : taskDateEnd;
-        String str = date.getDayOfMonth() +
+        return date.getDayOfMonth() +
                 " " +
                 mounths[date.getMonthValue() - 1];
-        return str;
     }
 
     public long getId() {

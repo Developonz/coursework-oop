@@ -1,4 +1,4 @@
-package com.example.planner.utils.Notifications;
+package com.example.planner.utils.notifications;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -9,7 +9,7 @@ import com.example.planner.models.Task;
 
 import java.util.Calendar;
 
-public class AlarmManagerNot {
+public class ManagerAlarm {
     public static void createOrUpdateNotification(Context context, Task task) {
         if (task.getTaskTime() == null) {
             return;
@@ -25,7 +25,7 @@ public class AlarmManagerNot {
             return;
         }
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, NotificationPublisher.class);
+        Intent intent = new Intent(context, PublisherNotification.class);
         intent.setAction("taskNot " + task.getId());
         intent.putExtra("title", task.getTitle());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -34,7 +34,7 @@ public class AlarmManagerNot {
 
     public static void deleteNotification(Context context, Task task) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, NotificationPublisher.class);
+        Intent intent = new Intent(context, PublisherNotification.class);
         intent.setAction("taskNot " + task.getId());
         intent.putExtra("title", task.getTitle());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

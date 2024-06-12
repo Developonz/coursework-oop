@@ -1,6 +1,5 @@
 package com.example.planner.models;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 
 public class Note {
@@ -10,7 +9,7 @@ public class Note {
     private String content;
     private String category;
     private LocalDate dateLastChange;
-    private final String[] mounths = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
+    private final static String[] mounths = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
 
     public Note() {
         this.id = -1;
@@ -69,9 +68,8 @@ public class Note {
     }
 
     public String getStringDate() {
-        String str = dateLastChange.getDayOfMonth() +
+        return dateLastChange.getDayOfMonth() +
                 " " +
                 mounths[dateLastChange.getMonthValue() - 1];
-        return str;
     }
 }

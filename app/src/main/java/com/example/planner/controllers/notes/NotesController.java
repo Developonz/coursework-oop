@@ -1,11 +1,8 @@
-package com.example.planner.controllers;
+package com.example.planner.controllers.notes;
 
 import android.content.Context;
 import com.example.planner.models.Note;
-import com.example.planner.models.Task;
 import com.example.planner.ui.notes.NotesViewModel;
-import com.example.planner.utils.Notifications.AlarmManagerNot;
-
 import java.util.ArrayList;
 
 public class NotesController {

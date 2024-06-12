@@ -13,7 +13,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.planner.controllers.TasksController;
+import com.example.planner.controllers.tasks.TasksController;
 import com.example.planner.databinding.FragmentTasksItemBinding;
 import com.example.planner.databinding.FragmentTasksItemCompleteBinding;
 import com.example.planner.databinding.HeaderOldTasksListBinding;
@@ -33,7 +33,7 @@ public class TasksTaskRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     private final List<Object> items;
     private final List<Task> filteredList;
     private int category = 0;
-    private boolean isStatusTasks;
+    private final boolean isStatusTasks;
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_HEADER_OLD = 1;
     private static final int VIEW_TYPE_TASK = 2;
@@ -98,7 +98,7 @@ public class TasksTaskRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderHolder) {
             ((HeaderHolder) holder).header.setText(((Task) items.get(position + 1)).getStringDate());
         } else if (holder instanceof TaskHolder) {
@@ -118,6 +118,7 @@ public class TasksTaskRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         return items.size();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void updateTasksList() {
         items.clear();
         if (filteredList.isEmpty()) {
@@ -306,7 +307,7 @@ public class TasksTaskRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
             mCheck.setOnClickListener(v -> {
                 if (listener != null) {
-                    int position = getAdapterPosition();
+                    int position = getBindingAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
                         mCheck.postDelayed(() -> listener.onItemCheckBoxClick(position), 750);
                     }
@@ -315,7 +316,7 @@ public class TasksTaskRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
             binding.contentPanel.setOnClickListener(v -> {
                 if (listener != null) {
-                    int position = getAdapterPosition();
+                    int position = getBindingAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
                         listener.onItemViewClick(position);
                     }
@@ -345,7 +346,7 @@ public class TasksTaskRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
 
             mContentView.setOnClickListener(v -> {
                 if (listener != null) {
-                    int position = getAdapterPosition();
+                    int position = getBindingAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
                         listener.onItemLinkClickListener();
                     }
