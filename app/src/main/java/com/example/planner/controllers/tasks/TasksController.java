@@ -5,7 +5,7 @@ import android.content.Context;
 import com.example.planner.R;
 import com.example.planner.models.Task;
 import com.example.planner.ui.tasks.TasksViewModel;
-import com.example.planner.utils.notifications.ManagerAlarm;
+import com.example.planner.notifications.ManagerAlarm;
 
 import java.util.ArrayList;
 import java.util.Arrays;

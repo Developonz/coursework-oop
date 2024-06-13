@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class TasksTaskRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnItemTaskHeaderOldRecyclerViewClickListener, Filterable {
+public class TasksRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnItemTaskHeaderOldRecyclerViewClickListener, Filterable {
     private final List<Object> items;
     private final List<Task> filteredList;
     private int category = 0;
@@ -45,7 +45,7 @@ public class TasksTaskRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
     private int numberSort = 0;
     private final String[] categoriesTitle = {"Все", "Личное", "Учёба", "Работа", "Желания"};
 
-    public TasksTaskRecyclerViewAdapter(TasksController controller, boolean isStatusTasks) {
+    public TasksRecyclerViewAdapter(TasksController controller, boolean isStatusTasks) {
         this.isStatusTasks = isStatusTasks;
         this.controller = controller;
         items = new ArrayList<>();
@@ -54,7 +54,7 @@ public class TasksTaskRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerV
         updateTasksList();
     }
 
-    public TasksTaskRecyclerViewAdapter(OnItemTaskRecyclerClickListener listener, OnItemCompleteTasksLinkRecyclerClickListener linkListener, TasksController controller, boolean isStatusTasks) {
+    public TasksRecyclerViewAdapter(OnItemTaskRecyclerClickListener listener, OnItemCompleteTasksLinkRecyclerClickListener linkListener, TasksController controller, boolean isStatusTasks) {
         this.isStatusTasks = isStatusTasks;
         this.controller = controller;
         items = new ArrayList<>();

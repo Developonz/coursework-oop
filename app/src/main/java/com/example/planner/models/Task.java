@@ -12,7 +12,6 @@ public class Task {
     private LocalTime taskTime;
     private String priority;
     private String category;
-
     private boolean status;
 
     private final static String[] mounths = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};

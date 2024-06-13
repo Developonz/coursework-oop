@@ -36,11 +36,11 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".utils.notifications.BootService" android:exported="true" />
+        <service android:name=".notifications.BootService" android:exported="true" />
 
 
-        <receiver android:name=".utils.notifications.PublisherNotification" />
-        <receiver android:name=".utils.notifications.BootReceiver"
+        <receiver android:name=".notifications.PublisherNotification" />
+        <receiver android:name=".notifications.BootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

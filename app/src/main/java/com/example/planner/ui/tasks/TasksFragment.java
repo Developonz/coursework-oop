@@ -34,7 +34,7 @@ import java.time.LocalDate;
 
 
 public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickListener, OnItemCompleteTasksLinkRecyclerClickListener {
-    private TasksTaskRecyclerViewAdapter adapter;
+    private TasksRecyclerViewAdapter adapter;
     private FragmentTasksBinding binding;
     private RecyclerView recyclerView;
     private TabLayout tabLayout;
@@ -176,7 +176,7 @@ public class TasksFragment extends Fragment implements OnItemTaskRecyclerClickLi
     private void setupRecyclerView() {
         recyclerView = binding.list;
         recyclerView.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
-        adapter = new TasksTaskRecyclerViewAdapter(this, this, controller, false);
+        adapter = new TasksRecyclerViewAdapter(this, this, controller, false);
         recyclerView.setAdapter(adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TaskItemTouchHelper(adapter, recyclerView, getActivity()));
         itemTouchHelper.attachToRecyclerView(recyclerView);

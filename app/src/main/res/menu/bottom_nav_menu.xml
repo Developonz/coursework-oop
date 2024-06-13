@@ -12,5 +12,5 @@
     <item
         android:id="@+id/notes"
         android:title="Заметки"
-        android:icon="@drawable/baseline_edit_note_24" />
+        android:icon="@drawable/note_list_icon_124054" />
 </menu>

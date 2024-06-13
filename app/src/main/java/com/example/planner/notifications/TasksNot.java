@@ -1,4 +1,4 @@
-package com.example.planner.utils.notifications;
+package com.example.planner.notifications;
 
 import android.annotation.TargetApi;
 import android.app.NotificationChannel;

@@ -27,7 +27,7 @@ import java.util.Objects;
 
 
 public class CompleteTasksFragment extends Fragment {
-    private TasksTaskRecyclerViewAdapter adapter;
+    private TasksRecyclerViewAdapter adapter;
     private FragmentTasksCompleteBinding binding;
     private TasksController controller;
     private SortDialog sortDialog;
@@ -132,7 +132,7 @@ public class CompleteTasksFragment extends Fragment {
     private void setupRecyclerView() {
         RecyclerView recyclerView = binding.list;
         recyclerView.setLayoutManager(new LinearLayoutManager(binding.getRoot().getContext()));
-        adapter = new TasksTaskRecyclerViewAdapter(controller, true);
+        adapter = new TasksRecyclerViewAdapter(controller, true);
         recyclerView.setAdapter(adapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TaskItemTouchHelper(adapter, recyclerView, getActivity()));
         itemTouchHelper.attachToRecyclerView(recyclerView);
